@@ -1,0 +1,143 @@
+/* ==================== PATIENT DETAILS PAGE - MEDICAL THEME ==================== */
+:root {
+  --primary-color: #00a896;
+  --primary-dark: #008577;
+  --secondary-color: #0077be;
+  --white: #ffffff;
+  --gray-100: #f3f4f6;
+  --gray-300: #d1d5db;
+  --gray-600: #4b5563;
+  --gray-800: #1f2937;
+  --radius-lg: 0.75rem;
+  --shadow-lg: 0 10px 25px rgba(0, 168, 150, 0.15);
+  --primary-glow: rgba(0, 168, 150, 0.2);
+}
+
+/* Background */
+.patient-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e0f7f5 0%, #f2fcfb 50%, #d0f3f1 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.patient-page::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(0, 168, 150, 0.06) 0%, transparent 70%);
+  animation: rotate-bg 30s linear infinite;
+}
+
+@keyframes rotate-bg {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Card */
+.patient-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbfd 100%);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(0, 168, 150, 0.1);
+  width: 100%;
+  max-width: 28rem;
+  position: relative;
+  z-index: 1;
+  animation: fadeInUp 0.8s ease-out;
+  text-align: center;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Title */
+.patient-card .title {
+  color: var(--primary-dark);
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  font-weight: 700;
+}
+
+.patient-card .title::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  margin: 0.75rem auto 0;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border-radius: 2px;
+}
+
+/* Text */
+.patient-card p {
+  color: var(--gray-800);
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  text-align: left;
+}
+
+.patient-card strong {
+  color: var(--primary-dark);
+}
+
+/* Logout Button */
+.logout-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: var(--white);
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 0.875rem;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0, 168, 150, 0.25);
+  transition: all 0.3s ease;
+  margin-top: 1.5rem;
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(0, 168, 150, 0.35);
+  background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .patient-card {
+    padding: 2rem;
+    max-width: 90%;
+  }
+
+  .patient-card .title {
+    font-size: 1.5rem;
+  }
+
+  .patient-card p {
+    font-size: 0.9rem;
+  }
+
+  .logout-btn {
+    font-size: 0.9rem;
+  }
+}

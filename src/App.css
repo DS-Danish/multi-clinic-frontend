@@ -1,0 +1,52 @@
+/* ==================== LOGIN PAGE - HOSPITAL THEME CSS ==================== */
+
+/* Your provided hospital theme CSS goes here — full content above, ending cleanly with: */
+
+/* Small Mobile (320px - 479px) */
+@media (max-width: 479px) {
+  :root {
+    font-size: 14px;
+  }
+
+  .min-h-screen.flex.items-center.justify-center.bg-gray-50 {
+    padding: var(--login-space-2);
+  }
+
+  .bg-white.p-8.rounded-lg.shadow-md.w-full.max-w-sm {
+    max-width: 100%;
+    padding: var(--login-space-5);
+    margin: var(--login-space-2);
+    border-radius: var(--login-radius-xl);
+  }
+
+  .bg-white.p-8.rounded-lg.shadow-md.w-full.max-w-sm > *:first-child::before {
+    font-size: 3rem;
+    margin-bottom: var(--login-space-3);
+  }
+
+  .text-2xl.font-bold.mb-6.text-center,
+  h1.text-2xl.font-bold.mb-6.text-center {
+    font-size: 1.25rem;
+    margin-bottom: var(--login-space-3);
+  }
+
+  .bg-white.p-8.rounded-lg.shadow-md.w-full.max-w-sm input[type="email"],
+  .bg-white.p-8.rounded-lg.shadow-md.w-full.max-w-sm input[type="password"],
+  .bg-white.p-8.rounded-lg.shadow-md.w-full.max-w-sm [class*="Input"] {
+    padding: var(--login-space-3);
+    font-size: 0.875rem;
+  }
+
+  .bg-white.p-8.rounded-lg.shadow-md.w-full.max-w-sm button,
+  .bg-white.p-8.rounded-lg.shadow-md.w-full.max-w-sm [class*="Button"] {
+    padding: var(--login-space-3) var(--login-space-5);
+    font-size: 0.9rem;
+  }
+
+  .text-sm.text-center.mt-4,
+  p.text-sm.text-center.mt-4 {
+    font-size: 0.8rem;
+  }
+}
+
+/* ==================== END OF LOGIN PAGE CSS ==================== */

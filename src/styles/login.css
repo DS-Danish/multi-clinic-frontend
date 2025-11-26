@@ -1,0 +1,140 @@
+/* ==================== LOGIN PAGE - MEDICAL THEME ==================== */
+:root {
+  --primary-color: #0077be;
+  --primary-dark: #005a8f;
+  --secondary-color: #00a896;
+  --white: #ffffff;
+  --gray-300: #d1d5db;
+  --gray-600: #4b5563;
+  --gray-800: #1f2937;
+  --radius-lg: 0.75rem;
+  --shadow-lg: 0 10px 25px rgba(0, 119, 190, 0.15);
+  --primary-glow: rgba(0, 119, 190, 0.2);
+}
+
+/* Background */
+.min-h-screen.flex.items-center.justify-center.bg-gray-50 {
+  background: linear-gradient(135deg, #e6f3ff 0%, #f0faff 50%, #e1f5fe 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.min-h-screen.flex.items-center.justify-center.bg-gray-50::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(0, 119, 190, 0.06) 0%, transparent 70%);
+  animation: rotate-bg 30s linear infinite;
+}
+@keyframes rotate-bg {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Card */
+.bg-white.p-8.rounded-lg.shadow-md.w-full.max-w-sm {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbfd 100%);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(0, 119, 190, 0.1);
+  width: 100%;
+  max-width: 28rem;
+  position: relative;
+  animation: fadeInUp 0.8s ease-out;
+  z-index: 1;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+h1.text-2xl.font-bold.mb-6.text-center {
+  color: var(--primary-dark);
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+h1.text-2xl.font-bold.mb-6.text-center::after {
+  content: '';
+  display: block;
+  margin: 0.75rem auto 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border-radius: 2px;
+}
+
+/* Inputs */
+label {
+  color: var(--gray-800);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid var(--gray-300);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px var(--primary-glow);
+  outline: none;
+}
+
+/* Button */
+button.w-full {
+  width: 100%;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: var(--white);
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 0.875rem;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0, 119, 190, 0.25);
+  transition: all 0.3s ease;
+}
+button.w-full:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(0, 119, 190, 0.35);
+}
+
+/* Footer link */
+p.text-sm.text-center.mt-4 {
+  color: var(--gray-600);
+  font-size: 0.9rem;
+}
+p.text-sm.text-center.mt-4 a {
+  color: var(--primary-color);
+  font-weight: 600;
+  text-decoration: none;
+  position: relative;
+}
+p.text-sm.text-center.mt-4 a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary-color);
+  transition: width 0.3s ease;
+}
+p.text-sm.text-center.mt-4 a:hover::after {
+  width: 100%;
+}
