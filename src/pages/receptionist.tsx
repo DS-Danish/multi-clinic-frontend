@@ -4,6 +4,7 @@ import { getCurrentUser, logoutUser } from "../utils/auth";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import EditAppointmentModal from "../components/ui/EditAppointmentDialog";
 import { useToast } from "../components/ui/ToastProvider";
+import { useNavigate } from "react-router-dom";
 
 type TPatient = {
   id: string;
@@ -22,6 +23,7 @@ type TAppointment = {
 
 export default function ReceptionistPage() {
   const toast = useToast();
+  const navigate = useNavigate();
   const showError = (msg: string) => toast.show(msg, "error");
 
   const [patients, setPatients] = useState<TPatient[]>([]);
@@ -42,12 +44,14 @@ export default function ReceptionistPage() {
   const [patientPage, setPatientPage] = useState(1);
   const PATIENT_LIMIT = 10;
 
-  // Search only
+  // Search
   const [search, setSearch] = useState("");
 
-  // Appointment Filters
-  const [appointmentDoctorFilter, setAppointmentDoctorFilter] = useState("");
-  const [appointmentDateFilter, setAppointmentDateFilter] = useState("");
+  // Appointment filters
+  const [appointmentDoctorFilter, setAppointmentDoctorFilter] =
+    useState("");
+  const [appointmentDateFilter, setAppointmentDateFilter] =
+    useState("");
 
   const [form, setForm] = useState({
     clinicId: "",
@@ -89,7 +93,7 @@ export default function ReceptionistPage() {
       .catch(() => showError("Failed to load appointments"));
   }, []);
 
-  // Load doctors when clinic changes
+  // Load doctors on clinic change
   useEffect(() => {
     if (!form.clinicId) {
       setDoctors([]);
@@ -101,7 +105,7 @@ export default function ReceptionistPage() {
       .catch(() => showError("Failed to load doctors"));
   }, [form.clinicId]);
 
-  // Load availability when doctor changes
+  // Load availability on doctor change
   useEffect(() => {
     if (!form.doctorId) {
       setAvailability([]);
@@ -113,7 +117,7 @@ export default function ReceptionistPage() {
       .catch(() => showError("Failed to load availability"));
   }, [form.doctorId]);
 
-  // Create Appointment
+  // Create appointment
   const createAppointment = async () => {
     try {
       await ReceptionistAPI.createAppointment(form);
@@ -132,7 +136,7 @@ export default function ReceptionistPage() {
     }
   };
 
-  // Accept Appointment
+  // Accept appointment
   const acceptAppointment = async (id: string) => {
     try {
       await ReceptionistAPI.acceptAppointment(id);
@@ -143,7 +147,7 @@ export default function ReceptionistPage() {
     }
   };
 
-  // Cancel Appointment
+  // Cancel appointment
   const handleCancel = (id: string) => {
     setSelectedId(id);
     setConfirmOpen(true);
@@ -161,7 +165,7 @@ export default function ReceptionistPage() {
     setConfirmOpen(false);
   };
 
-  // Edit Appointment
+  // Edit
   const handleEdit = (appt: any) => {
     setEditData(appt);
     setEditOpen(true);
@@ -177,7 +181,7 @@ export default function ReceptionistPage() {
     }
   };
 
-  // FILTERED PATIENT LIST
+  // Patients
   const filteredPatients = patients.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -187,7 +191,7 @@ export default function ReceptionistPage() {
     patientPage * PATIENT_LIMIT
   );
 
-  // FILTERED APPOINTMENTS
+  // Appointments
   const filteredAppointments = appointments
     .filter((a) =>
       appointmentDoctorFilter ? a.doctorId === appointmentDoctorFilter : true
@@ -210,8 +214,12 @@ export default function ReceptionistPage() {
       <header className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Receptionist Dashboard</h1>
-            <p className="text-sm text-gray-600 mt-1">Manage appointments & patients</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Receptionist Dashboard
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">
+              Manage appointments & patients
+            </p>
           </div>
 
           <button
@@ -227,16 +235,6 @@ export default function ReceptionistPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8 border-l-4 border-indigo-600">
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">User Information</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div><p className="text-sm text-gray-600">Name</p><p>{user?.name}</p></div>
-            <div><p className="text-sm text-gray-600">Email</p><p>{user?.email}</p></div>
-            <div><p className="text-sm text-gray-600">Role</p><p>{user?.role}</p></div>
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* LEFT SIDE */}
           <div className="lg:col-span-2 space-y-8">
@@ -246,71 +244,83 @@ export default function ReceptionistPage() {
                 Pending Appointments ({filteredAppointments.length})
               </div>
 
-              <div className="flex gap-3 p-4">
-                <select
-                  className="border px-3 py-2 rounded w-44"
-                  value={appointmentDoctorFilter}
-                  onChange={(e) => setAppointmentDoctorFilter(e.target.value)}
-                >
-                  <option value="">Filter by Doctor</option>
-                  {doctors.map((d: any) => (
-                    <option key={d.doctor.id} value={d.doctor.id}>
-                      {d.doctor.name}
-                    </option>
-                  ))}
-                </select>
-
-                <input
-                  type="date"
-                  className="border px-3 py-2 rounded"
-                  value={appointmentDateFilter}
-                  onChange={(e) => setAppointmentDateFilter(e.target.value)}
-                />
-              </div>
-
               <div className="p-6 space-y-4">
-                {paginatedAppointments.map((a) => (
-                  <div key={a.id} className="border p-4 rounded-lg shadow-sm">
-                    <h3 className="font-semibold text-lg">{a.patientName}</h3>
-                    <p className="text-gray-600 text-sm">{a.startTime}</p>
+                {paginatedAppointments.map((a) => {
+                  const patient = patients.find(
+                    (p) => p.name === a.patientName
+                  );
 
-                    <div className="mt-4 flex gap-2">
-                      <button
-                        className="bg-green-600 text-white px-4 py-2 rounded-lg"
-                        onClick={() => acceptAppointment(a.id)}
-                      >
-                        ✓ Accept
-                      </button>
+                  return (
+                    <div
+                      key={a.id}
+                      className="border p-4 rounded-lg shadow-sm"
+                    >
+                      <h3 className="font-semibold text-lg">
+                        {a.patientName}
+                      </h3>
+                      <p className="text-gray-600 text-sm">{a.startTime}</p>
 
-                      <button
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-                        onClick={() => handleEdit(a)}
-                      >
-                        ✎ Edit
-                      </button>
+                      <div className="mt-4 flex gap-2 flex-wrap">
+                        <button
+                          className="bg-green-600 text-white px-4 py-2 rounded-lg"
+                          onClick={() => acceptAppointment(a.id)}
+                        >
+                          ✓ Accept
+                        </button>
 
-                      <button
-                        className="bg-yellow-600 text-white px-4 py-2 rounded-lg"
-                        onClick={() => handleCancel(a.id)}
-                      >
-                        ✕ Cancel
-                      </button>
+                        <button
+                          className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+                          onClick={() => handleEdit(a)}
+                        >
+                          ✎ Edit
+                        </button>
+
+                        <button
+                          className="bg-yellow-600 text-white px-4 py-2 rounded-lg"
+                          onClick={() => handleCancel(a.id)}
+                        >
+                          ✕ Cancel
+                        </button>
+
+                        {/* BILLING BUTTON */}
+                        <button
+                          className="bg-purple-600 text-white px-4 py-2 rounded-lg"
+                          onClick={() =>
+                            navigate("/billing/create", {
+                              state: {
+                                appointmentId: a.id,
+                                patientId: patient?.id || "",
+                                patientName: a.patientName,
+                              },
+                            })
+                          }
+                        >
+                          💳 Bill
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 <div className="flex justify-center mt-4 space-x-4">
                   <button
                     disabled={appointmentPage === 1}
-                    onClick={() => setAppointmentPage((p) => p - 1)}
+                    onClick={() =>
+                      setAppointmentPage((p) => p - 1)
+                    }
                     className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
                   >
                     Previous
                   </button>
 
                   <button
-                    disabled={appointmentPage * APPOINT_LIMIT >= filteredAppointments.length}
-                    onClick={() => setAppointmentPage((p) => p + 1)}
+                    disabled={
+                      appointmentPage * APPOINT_LIMIT >=
+                      filteredAppointments.length
+                    }
+                    onClick={() =>
+                      setAppointmentPage((p) => p + 1)
+                    }
                     className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
                   >
                     Next
@@ -326,7 +336,6 @@ export default function ReceptionistPage() {
               </div>
 
               <div className="p-6">
-                {/* Search */}
                 <input
                   placeholder="Search patient..."
                   className="w-full border px-3 py-2 rounded-lg mb-4"
@@ -334,22 +343,25 @@ export default function ReceptionistPage() {
                   onChange={(e) => setSearch(e.target.value)}
                 />
 
-                {/* Patient List */}
                 <div className="max-h-96 overflow-y-auto space-y-2">
                   {paginatedPatients.map((p) => (
-                    <div key={p.id} className="border p-3 rounded-lg flex items-center">
+                    <div
+                      key={p.id}
+                      className="border p-3 rounded-lg flex items-center"
+                    >
                       <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
                         {p.name.charAt(0)}
                       </div>
                       <div>
                         <p className="font-medium">{p.name}</p>
-                        <p className="text-sm text-gray-600">{p.email}</p>
+                        <p className="text-sm text-gray-600">
+                          {p.email}
+                        </p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Pagination */}
                 <div className="flex justify-center mt-4 space-x-4">
                   <button
                     disabled={patientPage === 1}
@@ -360,7 +372,10 @@ export default function ReceptionistPage() {
                   </button>
 
                   <button
-                    disabled={patientPage * PATIENT_LIMIT >= filteredPatients.length}
+                    disabled={
+                      patientPage * PATIENT_LIMIT >=
+                      filteredPatients.length
+                    }
                     className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
                     onClick={() => setPatientPage((p) => p + 1)}
                   >
@@ -379,7 +394,6 @@ export default function ReceptionistPage() {
               </div>
 
               <div className="p-6 space-y-4">
-                {/* Clinic */}
                 <div>
                   <label>Clinic</label>
                   <select
@@ -398,7 +412,6 @@ export default function ReceptionistPage() {
                   </select>
                 </div>
 
-                {/* Doctor */}
                 <div>
                   <label>Doctor</label>
                   <select
@@ -411,17 +424,21 @@ export default function ReceptionistPage() {
                   >
                     <option value="">Select Doctor</option>
                     {doctors.map((d: any) => (
-                      <option key={d.doctor.id} value={d.doctor.id}>
+                      <option
+                        key={d.doctor.id}
+                        value={d.doctor.id}
+                      >
                         {d.doctor.name}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                {/* Availability */}
                 {availability.length > 0 && (
                   <div className="bg-purple-50 border p-4 rounded-lg">
-                    <p className="text-sm font-semibold">Doctor Availability:</p>
+                    <p className="text-sm font-semibold">
+                      Doctor Availability:
+                    </p>
                     {availability.map((a: any, i: number) => (
                       <p key={i}>
                         Day {a.dayOfWeek}: {a.startTime} – {a.endTime}
@@ -430,7 +447,6 @@ export default function ReceptionistPage() {
                   </div>
                 )}
 
-                {/* Patient */}
                 <div>
                   <label>Patient</label>
                   <select
@@ -449,7 +465,6 @@ export default function ReceptionistPage() {
                   </select>
                 </div>
 
-                {/* Time */}
                 <div>
                   <label>Start Time</label>
                   <input

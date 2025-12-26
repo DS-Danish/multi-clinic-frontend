@@ -3,9 +3,9 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Button } from "../components/ui/button";
 import { loginUser } from "../utils/auth";
-import { Stethoscope, UserCheck, Users } from "lucide-react";
+import { Stethoscope, UserCheck, Users, Building2, ShieldCheck } from "lucide-react";
 import "../styles/login.css";
-import { useToast } from "../components/ui/ToastProvider";
+// import { useToast } from "../components/ui/ToastProvider";
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>("");
@@ -15,31 +15,44 @@ export default function LoginPage() {
   // -------------------------------
   // ROLES ARRAY (Required)
   // -------------------------------
-  const roles: {
-    id: string;
-    label: string;
-    icon: any;
-    color: string;
-  }[] = [
-    {
-      id: "DOCTOR",
-      label: "Doctor",
-      icon: Stethoscope,
-      color: "from-blue-500 to-cyan-500",
-    },
-    {
-      id: "PATIENT",
-      label: "Patient",
-      icon: Users,
-      color: "from-green-500 to-emerald-500",
-    },
-    {
-      id: "RECEPTIONIST",
-      label: "Receptionist",
-      icon: UserCheck,
-      color: "from-purple-500 to-pink-500",
-    },
-  ];
+ const roles: {
+  id: string;
+  label: string;
+  icon: any;
+  color: string;
+}[] = [
+  {
+    id: "DOCTOR",
+    label: "Doctor",
+    icon: Stethoscope,
+    color: "from-blue-500 to-cyan-500",
+  },
+  {
+    id: "PATIENT",
+    label: "Patient",
+    icon: Users,
+    color: "from-green-500 to-emerald-500",
+  },
+  {
+    id: "RECEPTIONIST",
+    label: "Receptionist",
+    icon: UserCheck,
+    color: "from-purple-500 to-pink-500",
+  },
+  {
+    id: "CLINIC_ADMIN",
+    label: "Clinic Admin",
+    icon: Building2,
+    color: "from-orange-500 to-yellow-500",
+  },
+  {
+    id: "SYSTEM_ADMIN",
+    label: "Super Admin",
+    icon: ShieldCheck,
+    color: "from-red-500 to-rose-500",
+  },
+];
+
 
   // -------------------------------
   // LOGIN HANDLER
@@ -76,9 +89,13 @@ export default function LoginPage() {
           break;
 
         case "SYSTEM_ADMIN":
-        case "CLINIC_ADMIN":
-          window.location.href = "/dashboard";
+          window.location.href = "/super-admin";
           break;
+
+        case "CLINIC_ADMIN":
+          window.location.href = "/admin-dashboard";
+          break;
+
 
         default:
           window.location.href = "/";
@@ -102,7 +119,7 @@ export default function LoginPage() {
             <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
               <Stethoscope className="w-7 h-7" />
             </div>
-            <h1 className="text-3xl font-bold">HealthCare Portal</h1>
+            <h1 className="text-3xl font-bold">ClinicConnect AI</h1>
           </div>
           <p className="text-blue-100 text-lg max-w-md">
             Streamlined healthcare management system for doctors, patients, and
@@ -126,7 +143,7 @@ export default function LoginPage() {
             </div>
           </div>
           <p className="text-sm text-blue-200">
-            © 2024 HealthCare Portal. All rights reserved.
+            © 2025 ClinicConnect AI. All rights reserved.
           </p>
         </div>
 
@@ -142,7 +159,7 @@ export default function LoginPage() {
               <Stethoscope className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-gray-800">
-              HealthCare Portal
+              ClinicConnect AI
             </h1>
           </div>
 
@@ -155,7 +172,8 @@ export default function LoginPage() {
             </p>
 
             {/* Role Selector */}
-            <div className="grid grid-cols-3 gap-2 mb-6 bg-gray-100 p-1.5 rounded-xl">
+            <div className="grid grid-cols-4 gap-2 mb-6 bg-gray-100 p-1.5 rounded-xl
+">
               {roles.map(
                 (
                   role: {
@@ -243,7 +261,7 @@ export default function LoginPage() {
               href="#"
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
-              support@healthcare.com
+              support@ClinicConnect AI
             </a>
           </p>
         </div>

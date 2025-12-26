@@ -80,7 +80,7 @@ export default function SignupPage() {
             <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
               <Stethoscope className="w-7 h-7" />
             </div>
-            <h1 className="text-3xl font-bold">HealthCare Portal</h1>
+            <h1 className="text-3xl font-bold">ClinicConnect AI</h1>
           </div>
 
           <h2 className="text-4xl font-bold mb-6 leading-tight">
@@ -111,7 +111,7 @@ export default function SignupPage() {
 
         <div className="relative z-10">
           <p className="text-sm text-blue-200">
-            © 2024 HealthCare Portal. All rights reserved.
+            © 2025 ClinicConnect AI. All rights reserved.
           </p>
         </div>
 
@@ -126,7 +126,7 @@ export default function SignupPage() {
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
               <Stethoscope className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800">HealthCare Portal</h1>
+            <h1 className="text-2xl font-bold text-gray-800">ClinicConnect AI</h1>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -244,7 +244,7 @@ export default function SignupPage() {
           <p className="text-center text-sm text-gray-500 mt-6">
             Need help? Contact{" "}
             <a href="#" className="text-blue-600 font-medium">
-              support@healthcare.com
+              support@ClinicConnect AI
             </a>
           </p>
         </div>

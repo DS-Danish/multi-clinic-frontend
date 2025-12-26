@@ -58,7 +58,7 @@ export function logoutUser() {
   localStorage.removeItem("currentUser");
 }
 
-// Get logged-in user
+// 👤 Get logged-in user
 export function getCurrentUser(): AuthUser | null {
   try {
     const raw = localStorage.getItem("currentUser");
@@ -68,7 +68,7 @@ export function getCurrentUser(): AuthUser | null {
   }
 }
 
-// Get token
+// 🔑 Get token
 export function getToken(): string | null {
   return localStorage.getItem("token");
 }

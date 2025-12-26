@@ -8,15 +8,13 @@ const api: AxiosInstance = axios.create({
   },
 });
 
-// 🔥 Automatically attach Authorization token to every request
+// Attach token automatically
 api.interceptors.request.use((config) => {
   const token = getToken();
-
   if (token) {
     config.headers = config.headers || {};
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
 

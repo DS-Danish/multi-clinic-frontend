@@ -5,6 +5,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import ToastProvider from "./components/ui/ToastProvider";
 
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
