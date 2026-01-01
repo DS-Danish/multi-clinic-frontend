@@ -5,6 +5,7 @@ import ConfirmDialog from "../components/ui/ConfirmDialog";
 import EditAppointmentModal from "../components/ui/EditAppointmentDialog";
 import { useToast } from "../components/ui/ToastProvider";
 import { useNavigate } from "react-router-dom";
+import { AppointmentStatus } from "../types/appointment.types";
 
 type TPatient = {
   id: string;
@@ -28,6 +29,7 @@ export default function ReceptionistPage() {
 
   const [patients, setPatients] = useState<TPatient[]>([]);
   const [appointments, setAppointments] = useState<TAppointment[]>([]);
+  const [myClinic, setMyClinic] = useState<any>(null);
   const [clinics, setClinics] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<any[]>([]);
   const [availability, setAvailability] = useState<any[]>([]);
@@ -63,6 +65,16 @@ export default function ReceptionistPage() {
   });
 
   const user = getCurrentUser();
+
+  // Load Receptionist's Clinic
+  useEffect(() => {
+    ReceptionistAPI.getMyClinic()
+      .then((res) => {
+        setMyClinic(res.data);
+        setForm((prev) => ({ ...prev, clinicId: res.data.id }));
+      })
+      .catch(() => showError("Failed to load clinic"));
+  }, []);
 
   // Load Clinics
   useEffect(() => {
@@ -121,7 +133,7 @@ export default function ReceptionistPage() {
   const createAppointment = async () => {
     try {
       await ReceptionistAPI.createAppointment(form);
-      toast.show("Appointment created", "success");
+      toast.show("Appointment scheduled successfully", "success");
 
       setForm({
         clinicId: "",
@@ -141,7 +153,7 @@ export default function ReceptionistPage() {
     try {
       await ReceptionistAPI.acceptAppointment(id);
       setAppointments((prev) => prev.filter((a) => a.id !== id));
-      toast.show("Appointment accepted", "success");
+      toast.show("Appointment confirmed and scheduled", "success");
     } catch {
       showError("Failed to accept appointment");
     }
@@ -302,16 +314,20 @@ export default function ReceptionistPage() {
                   );
                 })}
 
-                <div className="flex justify-center mt-4 space-x-4">
+                <div className="flex justify-center items-center mt-4 space-x-4">
                   <button
                     disabled={appointmentPage === 1}
                     onClick={() =>
                       setAppointmentPage((p) => p - 1)
                     }
-                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
+
+                  <span className="text-gray-700 font-medium">
+                    Page {appointmentPage} of {Math.ceil(filteredAppointments.length / APPOINT_LIMIT) || 1}
+                  </span>
 
                   <button
                     disabled={
@@ -321,7 +337,7 @@ export default function ReceptionistPage() {
                     onClick={() =>
                       setAppointmentPage((p) => p + 1)
                     }
-                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>
@@ -362,21 +378,25 @@ export default function ReceptionistPage() {
                   ))}
                 </div>
 
-                <div className="flex justify-center mt-4 space-x-4">
+                <div className="flex justify-center items-center mt-4 space-x-4">
                   <button
                     disabled={patientPage === 1}
-                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => setPatientPage((p) => p - 1)}
                   >
                     Previous
                   </button>
+
+                  <span className="text-gray-700 font-medium">
+                    Page {patientPage} of {Math.ceil(filteredPatients.length / PATIENT_LIMIT) || 1}
+                  </span>
 
                   <button
                     disabled={
                       patientPage * PATIENT_LIMIT >=
                       filteredPatients.length
                     }
-                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => setPatientPage((p) => p + 1)}
                   >
                     Next
@@ -394,23 +414,12 @@ export default function ReceptionistPage() {
               </div>
 
               <div className="p-6 space-y-4">
-                <div>
-                  <label>Clinic</label>
-                  <select
-                    className="w-full border px-4 py-2 rounded-lg"
-                    value={form.clinicId}
-                    onChange={(e) =>
-                      setForm({ ...form, clinicId: e.target.value })
-                    }
-                  >
-                    <option value="">Select Clinic</option>
-                    {clinics.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {myClinic && (
+                  <div className="bg-purple-50 border border-purple-200 p-4 rounded-lg mb-4">
+                    <p className="text-sm font-semibold text-purple-900">Your Clinic:</p>
+                    <p className="text-lg font-bold text-purple-700">{myClinic.name}</p>
+                  </div>
+                )}
 
                 <div>
                   <label>Doctor</label>

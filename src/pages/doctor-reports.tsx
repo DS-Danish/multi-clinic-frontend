@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getCurrentUser } from "../utils/auth";
 import api from "../services/api";
 import { FileText } from "lucide-react";
+import DoctorLayout from "../components/DoctorLayout";
 
 type TReport = {
   id: string;
@@ -38,8 +39,9 @@ const DoctorReportsPage: React.FC = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 lg:pl-64 pt-20">
-      <div className="max-w-5xl mx-auto">
+    <DoctorLayout userName={user.name}>
+      <div className="p-6 lg:p-8">
+        <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Your Reports</h1>
         <p className="text-gray-600 mb-6">
           Review all reports generated for your appointments.
@@ -93,8 +95,9 @@ const DoctorReportsPage: React.FC = () => {
             </tbody>
           </table>
         </div>
+        </div>
       </div>
-    </div>
+    </DoctorLayout>
   );
 };
 

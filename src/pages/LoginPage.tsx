@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Button } from "../components/ui/button";
-import { loginUser } from "../utils/auth";
+import { loginUser, getCurrentUser } from "../utils/auth";
 import { Stethoscope, UserCheck, Users, Building2, ShieldCheck } from "lucide-react";
 import "../styles/login.css";
 import { useToast } from "../components/ui/ToastProvider";
@@ -12,6 +12,33 @@ export default function LoginPage() {
   const [password, setPassword] = useState<string>("");
   const [activeRole, setActiveRole] = useState<string>("DOCTOR");
   const toast = useToast();
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      // Redirect to appropriate dashboard based on role
+      switch (currentUser.role) {
+        case "DOCTOR":
+          window.location.href = "/doctor-dashboard";
+          break;
+        case "RECEPTIONIST":
+          window.location.href = "/receptionist";
+          break;
+        case "PATIENT":
+          window.location.href = "/patient-details";
+          break;
+        case "SYSTEM_ADMIN":
+          window.location.href = "/super-admin";
+          break;
+        case "CLINIC_ADMIN":
+          window.location.href = "/admin-dashboard";
+          break;
+        default:
+          break;
+      }
+    }
+  }, []);
 
   // -------------------------------
   // ROLES ARRAY (Required)
@@ -60,16 +87,10 @@ export default function LoginPage() {
   // -------------------------------
   const handleLogin = async (): Promise<void> => {
     try {
-      const user = await loginUser(email.trim(), password);
+      const user = await loginUser(email.trim(), password, activeRole as any);
 
       if (!user) {
         toast.show("Invalid credentials", "error");
-        return;
-      }
-
-      // NEW ROLE MISMATCH VALIDATION
-      if (user.role !== activeRole) {
-        toast.show(`Please select the correct role: ${user.role}`, "error");
         return;
       }
 
