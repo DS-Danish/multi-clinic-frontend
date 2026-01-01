@@ -6,8 +6,10 @@ import { registerUser } from "../utils/auth";
 import type { UserRole } from "../utils/auth";
 import { Stethoscope, UserCheck, Users, CheckCircle } from "lucide-react";
 import "../styles/signup.css";
+import { useToast } from "../components/ui/ToastProvider";
 
 export default function SignupPage() {
+  const toast = useToast();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -27,11 +29,11 @@ export default function SignupPage() {
     });
 
     if (!res) {
-      alert("Signup failed. Email may already exist.");
+      toast.show("Signup failed. Email may already exist.", "error");
       return;
     }
 
-    alert("Signup successful!");
+    toast.show("Signup successful!", "success");
 
     if (form.role === "DOCTOR") {
       window.location.href = "/dashboard";

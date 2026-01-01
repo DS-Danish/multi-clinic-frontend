@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { BillingAPI } from "../services/billing.service";
+import { useToast } from "../components/ui/ToastProvider";
 
 export default function CreateBillPage() {
+  const toast = useToast();
   const [form, setForm] = useState({
     appointmentId: "",
     patientId: "",
@@ -11,7 +13,7 @@ export default function CreateBillPage() {
 
   const submit = async () => {
     const res = await BillingAPI.createBill(form);
-    alert("Bill Created: " + res.data.id);
+    toast.show("Bill Created: " + res.data.id, "success");
   };
 
   return (

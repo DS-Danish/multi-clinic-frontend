@@ -13,6 +13,7 @@ import CreateBillPage from "./pages/CreateBillPage";
 import SuperAdminDashboard from "./pages/Super-admin";
 import AdminDashboard from "./pages/ClinicAdminDashboard";
 import { getCurrentUser, getToken } from "./utils/auth";
+import ToastProvider from "./components/ui/ToastProvider";
 
 const Guard = ({
   allow,
@@ -32,11 +33,12 @@ const Guard = ({
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+    <ToastProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
 
         {/* Doctor */}
         <Route
@@ -132,5 +134,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
+    </ToastProvider>
   );
 }

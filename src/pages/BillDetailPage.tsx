@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { BillingAPI } from "../services/billing.service";
 import { useParams } from "react-router-dom";
+import { useToast } from "../components/ui/ToastProvider";
 
 export default function BillDetailPage() {
+  const toast = useToast();
   const { billId } = useParams();
   const [bill, setBill] = useState<any>(null);
   const [amount, setAmount] = useState(0);
@@ -19,7 +21,7 @@ export default function BillDetailPage() {
       amount,
       method: "CASH",
     });
-    alert("Payment successful");
+    toast.show("Payment successful", "success");
   };
 
   if (!bill) return <div>Loading...</div>;

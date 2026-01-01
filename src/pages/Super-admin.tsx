@@ -9,6 +9,7 @@ import {
   LogOut,
   LayoutDashboard
 } from "lucide-react";
+import { useToast } from "../components/ui/ToastProvider";
 
 type Clinic = {
   id: string;
@@ -30,6 +31,7 @@ type FormField =
   | "adminPassword";
 
 export default function SuperAdminDashboard() {
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState("dashboard");
 
   // ⭐ FETCHED FROM BACKEND — no more dummy data
@@ -81,7 +83,7 @@ export default function SuperAdminDashboard() {
         adminPassword: formData.adminPassword,
       });
 
-      alert("Clinic + Admin created successfully!");
+      toast.show("Clinic + Admin created successfully!", "success");
 
       // Refresh real clinic list
       await loadClinics();
@@ -100,7 +102,7 @@ export default function SuperAdminDashboard() {
       setActiveTab("dashboard");
     } catch (err: any) {
       console.error(err);
-      alert(err.response?.data?.message || "Failed to create clinic");
+      toast.show(err.response?.data?.message || "Failed to create clinic", "error");
     }
   };
 
