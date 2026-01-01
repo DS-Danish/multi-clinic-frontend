@@ -1,5 +1,6 @@
 import api from "./api";
 
+export const getMyClinic = () => api.get("/receptionist/my-clinic");
 export const listPatients = () => api.get("/receptionist/patients");
 export const listClinics = () => api.get("/clinics");
 export const listClinicDoctors = (clinicId: string) => api.get(`/receptionist/clinics/${clinicId}/doctors`);
@@ -21,6 +22,7 @@ export const listPendingAppointments = (page = 1, search = "") =>
   api.get(`/receptionist/appointments/pending?page=${page}&search=${search}`);
 
 export const ReceptionistAPI = {
+  getMyClinic,
   listPatients,
   listClinics,
   listClinicDoctors,

@@ -3,6 +3,7 @@ import { getCurrentUser } from "../utils/auth";
 import api from "../services/api";
 import { Input } from "../components/ui/input";
 import { User as UserIcon } from "lucide-react";
+import DoctorLayout from "../components/DoctorLayout";
 
 type TPatient = {
   id: string;
@@ -57,8 +58,9 @@ const DoctorPatientsPage: React.FC = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 lg:pl-64 pt-20">
-      <div className="max-w-5xl mx-auto">
+    <DoctorLayout userName={user.name}>
+      <div className="p-6 lg:p-8">
+        <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">All Patients</h1>
         <p className="text-gray-600 mb-6">
           List of all registered patients in the system.
@@ -116,8 +118,9 @@ const DoctorPatientsPage: React.FC = () => {
             </tbody>
           </table>
         </div>
+        </div>
       </div>
-    </div>
+    </DoctorLayout>
   );
 };
 
