@@ -5,12 +5,13 @@ import { Button } from "../components/ui/button";
 import { loginUser } from "../utils/auth";
 import { Stethoscope, UserCheck, Users, Building2, ShieldCheck } from "lucide-react";
 import "../styles/login.css";
-// import { useToast } from "../components/ui/ToastProvider";
+import { useToast } from "../components/ui/ToastProvider";
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [activeRole, setActiveRole] = useState<string>("DOCTOR");
+  const toast = useToast();
 
   // -------------------------------
   // ROLES ARRAY (Required)
@@ -62,17 +63,17 @@ export default function LoginPage() {
       const user = await loginUser(email.trim(), password);
 
       if (!user) {
-        alert("Invalid credentials");
+        toast.show("Invalid credentials", "error");
         return;
       }
 
       // NEW ROLE MISMATCH VALIDATION
       if (user.role !== activeRole) {
-        alert(`Please select the correct role: ${user.role}`);
+        toast.show(`Please select the correct role: ${user.role}`, "error");
         return;
       }
 
-      alert(`Welcome, ${user.name}`);
+      toast.show(`Welcome, ${user.name}`, "success");
 
       // ROLE BASED REDIRECT ---------------------
       switch (user.role) {
@@ -101,7 +102,7 @@ export default function LoginPage() {
           window.location.href = "/";
       }
     } catch (error) {
-      alert("Login failed");
+      toast.show("Login failed", "error");
     }
   };
 

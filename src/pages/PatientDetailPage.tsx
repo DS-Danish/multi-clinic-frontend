@@ -13,8 +13,10 @@ import {
 
 import api from "../services/api";
 import { getCurrentUser, logoutUser } from "../utils/auth";
+import { useToast } from "../components/ui/ToastProvider";
 
 export default function PatientDetailPage() {
+  const toast = useToast();
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -79,7 +81,7 @@ export default function PatientDetailPage() {
   // ---------------------------------------
   const handleCreateAppointment = async () => {
     if (!selectedClinic || !selectedDoctor || !startTime || !endTime) {
-      alert("Please fill all fields");
+      toast.show("Please fill all fields", "error");
       return;
     }
 
@@ -92,13 +94,13 @@ export default function PatientDetailPage() {
         endTime,
       });
 
-      alert("Appointment request sent!");
+      toast.show("Appointment request sent!", "success");
 
       loadAppointments(); // refresh UI
       setStartTime("");
       setEndTime("");
     } catch (err: any) {
-      alert(err.response?.data?.message || "Unable to create appointment");
+      toast.show(err.response?.data?.message || "Unable to create appointment", "error");
     }
   };
 

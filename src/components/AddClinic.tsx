@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import api from "../services/api";
+import { useToast } from "./ui/ToastProvider";
 
 interface AddClinicProps {
   onAdded: () => void;
 }
 
 export const AddClinic: React.FC<AddClinicProps> = ({ onAdded }) => {
+  const toast = useToast();
   const [form, setForm] = useState({
     name: "",
     location: "",
@@ -27,10 +29,10 @@ export const AddClinic: React.FC<AddClinicProps> = ({ onAdded }) => {
       await api.post("/clinics", form);
       setForm({ name: "", location: "", contact: "" });
       onAdded();
-      alert("Clinic added successfully!");
+      toast.show("Clinic added successfully!", "success");
     } catch (err) {
       console.error("Error adding clinic:", err);
-      alert("Failed to add clinic. Please try again.");
+      toast.show("Failed to add clinic. Please try again.", "error");
     }
   };
 
