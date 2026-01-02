@@ -32,11 +32,11 @@ export default function ToastProvider({ children }: any) {
     <ToastContext.Provider value={{ show }}>
       {children}
 
-      <div className="fixed top-5 right-5 space-y-3 z-50 max-w-md">
+      <div className="fixed top-5 right-5 space-y-3 z-50 max-w-md pointer-events-none">
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-white transform transition-all duration-300 ease-in-out animate-slide-in ${
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-white transform transition-all duration-300 ease-in-out animate-slide-in pointer-events-auto ${
               t.type === "success" 
                 ? "bg-gradient-to-r from-green-500 to-emerald-600" 
                 : "bg-gradient-to-r from-red-500 to-rose-600"

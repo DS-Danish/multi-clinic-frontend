@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Users, 
@@ -21,6 +22,7 @@ import {
 } from "lucide-react";
 
 export default function ClinicAdminDashboard() {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("dashboard");
 
   const stats = {
@@ -43,7 +45,7 @@ export default function ClinicAdminDashboard() {
     { icon: UserPlus, label: "Add Doctor", color: "bg-blue-500", action: () => {} },
     { icon: Users, label: "Add Patient", color: "bg-green-500", action: () => {} },
     { icon: CalendarPlus, label: "New Appointment", color: "bg-purple-500", action: () => {} },
-    { icon: UserCog, label: "Add Receptionist", color: "bg-orange-500", action: () => {} },
+    { icon: UserCog, label: "Add Receptionist", color: "bg-orange-500", action: () => navigate("/admin-dashboard/receptionists/add") },
   ];
 
   return (
@@ -75,7 +77,13 @@ export default function ClinicAdminDashboard() {
           ].map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveSection(item.id)}
+              onClick={() => {
+                if (item.id === "receptionists") {
+                  navigate("/admin-dashboard/receptionists");
+                } else {
+                  setActiveSection(item.id);
+                }
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                 activeSection === item.id
                   ? "bg-blue-50 text-blue-600 shadow-sm"
@@ -225,6 +233,7 @@ export default function ClinicAdminDashboard() {
                 {quickActions.map((action, index) => (
                   <button
                     key={index}
+                    onClick={action.action}
                     className="flex items-center gap-4 p-4 border-2 border-gray-100 rounded-xl hover:border-blue-500 hover:shadow-md transition"
                   >
                     <div className={`${action.color} p-3 rounded-lg`}>
