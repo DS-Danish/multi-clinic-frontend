@@ -24,17 +24,19 @@ export interface ChatResponse {
 }
 
 export interface UploadFileResponse {
-  filename: string;
-  stored_path: string;
+  filenames: string[];
+  count: number;
   status: string;
 }
 
 /**
- * Upload a document file (PDF, TXT, or MD) for RAG processing
+ * Upload document files (PDF, TXT, or MD) for RAG processing
  */
-export const uploadDocument = async (file: File): Promise<UploadFileResponse> => {
+export const uploadDocument = async (files: File[]): Promise<UploadFileResponse> => {
   const formData = new FormData();
-  formData.append("file", file);
+  files.forEach(file => {
+    formData.append("files", file);
+  });
 
   const response = await chatbotApi.post<UploadFileResponse>("/Upload_File", formData, {
     headers: {
