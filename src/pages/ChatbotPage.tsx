@@ -19,7 +19,7 @@ export default function ChatbotPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState<string | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
   const [uploadLoading, setUploadLoading] = useState(false);
   const [error, setError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -31,36 +31,47 @@ export default function ChatbotPage() {
   }, [messages]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const fileList = event.target.files;
+    if (!fileList || fileList.length === 0) return;
 
-    // Validate file type
+    const files = Array.from(fileList);
     const validTypes = [".pdf", ".txt", ".md"];
-    const fileExtension = file.name.substring(file.name.lastIndexOf("."));
-    if (!validTypes.includes(fileExtension.toLowerCase())) {
-      setError("Please upload a PDF, TXT, or MD file");
-      return;
+    
+    // Validate all files
+    for (const file of files) {
+      const fileExtension = file.name.substring(file.name.lastIndexOf("."));
+      if (!validTypes.includes(fileExtension.toLowerCase())) {
+        setError(`Invalid file type: ${file.name}. Please upload only PDF, TXT, or MD files.`);
+        return;
+      }
     }
 
     setUploadLoading(true);
     setError("");
 
     try {
-      const response = await ChatbotAPI.uploadDocument(file);
-      setUploadedFile(file.name);
-      setMessages([
+      const response = await ChatbotAPI.uploadDocument(files);
+      setUploadedFiles(prev => [...prev, ...response.filenames]);
+      
+      const fileList = response.filenames.join(", ");
+      setMessages(prev => [
+        ...prev,
         {
           role: "assistant",
-          content: `✅ ${response.filename} processed successfully! You can now ask questions about the document.`,
+          content: `✅ Successfully uploaded ${response.count} file(s): ${fileList}. You can now ask questions about these documents.`,
         },
       ]);
     } catch (err: any) {
       setError(
-        err.response?.data?.message || "Failed to upload file. Make sure the FastAPI backend is running."
+        err.response?.data?.message || "Failed to upload files. Make sure the FastAPI backend is running."
       );
       console.error(err);
     } finally {
       setUploadLoading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -133,14 +144,14 @@ export default function ChatbotPage() {
           {/* File Upload Section */}
           <div className="bg-white rounded-xl shadow-md p-6 border-2 border-dashed border-gray-200">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 flex-1">
                 <Upload className="text-blue-600" size={24} />
-                <div>
-                  <h3 className="font-semibold text-gray-900">Upload Document</h3>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">Upload Documents</h3>
                   <p className="text-sm text-gray-500">
-                    {uploadedFile
-                      ? `Current file: ${uploadedFile}`
-                      : "Upload PDF, TXT, or MD file to get started"}
+                    {uploadedFiles.length > 0
+                      ? `${uploadedFiles.length} file(s) uploaded: ${uploadedFiles.slice(0, 3).join(", ")}${uploadedFiles.length > 3 ? `... +${uploadedFiles.length - 3} more` : ""}`
+                      : "Select multiple PDF, TXT, or MD files to get started"}
                   </p>
                 </div>
               </div>
@@ -167,6 +178,7 @@ export default function ChatbotPage() {
                 accept=".pdf,.txt,.md"
                 onChange={handleFileUpload}
                 className="hidden"
+                multiple
               />
             </div>
           </div>
@@ -267,10 +279,10 @@ export default function ChatbotPage() {
             <div>
               <p className="font-medium text-blue-900">How to use:</p>
               <ol className="text-sm text-blue-800 mt-2 space-y-1 list-decimal list-inside">
-                <li>Upload a medical document or clinic resource (PDF, TXT, or MD format)</li>
-                <li>Wait for the document to be processed</li>
+                <li>Upload one or multiple medical documents or clinic resources (PDF, TXT, or MD format)</li>
+                <li>Wait for the documents to be processed</li>
                 <li>Ask questions about the uploaded content</li>
-                <li>Get AI-powered responses based on your documents</li>
+                <li>Get AI-powered responses based on all your documents</li>
               </ol>
               <p className="text-xs text-blue-700 mt-3">
                 <strong>Note:</strong> Make sure the FastAPI backend is running at{" "}
