@@ -9,6 +9,7 @@ import {
   Activity,
   Bell,
   Clock,
+  MessageCircle,
 } from "lucide-react";
 
 import api from "../services/api";
@@ -221,12 +222,21 @@ export default function PatientDetailPage() {
             </div>
           </div>
 
-          <button
-            onClick={handleLogout}
-            className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-md"
-          >
-            Logout
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => window.location.href = "/chatbot"}
+              className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md flex items-center gap-2"
+            >
+              <MessageCircle size={20} />
+              AI Medical Assistant
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-md"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 

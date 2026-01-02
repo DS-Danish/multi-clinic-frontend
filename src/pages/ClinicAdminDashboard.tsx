@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { ClinicAdminAPI } from "../services/clinicAdmin.service";
 import { 
   LayoutDashboard, 
   Users, 
@@ -18,21 +19,90 @@ import {
   CheckCircle,
   AlertCircle,
   UserPlus,
-  CalendarPlus
+  CalendarPlus,
+  MessageCircle
 } from "lucide-react";
 
 export default function ClinicAdminDashboard() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("dashboard");
+  const [loading, setLoading] = useState(true);
+  const [clinicId, setClinicId] = useState("");
+  
+  const [stats, setStats] = useState({
+    totalDoctors: 0,
+    totalPatients: 0,
+    todayAppointments: 0,
+    pendingAppointments: 0,
+    revenue: 0,
+    receptionists: 0
+  });
 
-  const stats = {
-    totalDoctors: 8,
-    totalPatients: 342,
-    todayAppointments: 24,
-    pendingAppointments: 7,
-    revenue: 15420,
-    receptionists: 3
-  };
+  const [doctors, setDoctors] = useState<any[]>([]);
+  const [patients, setPatients] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [receptionists, setReceptionists] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchClinicData = async () => {
+      try {
+        setLoading(true);
+        
+        // Get clinic info first
+        const clinicRes = await ClinicAdminAPI.getMyClinic();
+        const currentClinicId = clinicRes.data.id;
+        setClinicId(currentClinicId);
+
+        // Fetch all data in parallel
+        const [doctorsRes, patientsRes, appointmentsRes, receptionistsRes] = await Promise.all([
+          ClinicAdminAPI.getClinicDoctors(currentClinicId).catch(() => ({ data: [] })),
+          ClinicAdminAPI.getClinicPatients(currentClinicId).catch(() => ({ data: [] })),
+          ClinicAdminAPI.getClinicAppointments(currentClinicId).catch(() => ({ data: [] })),
+          ClinicAdminAPI.getClinicReceptionists(currentClinicId).catch(() => ({ data: [] })),
+        ]);
+
+        const doctors = Array.isArray(doctorsRes.data) ? doctorsRes.data : [];
+        const patients = Array.isArray(patientsRes.data) ? patientsRes.data : [];
+        const appointments = Array.isArray(appointmentsRes.data) ? appointmentsRes.data : [];
+        const receptionists = Array.isArray(receptionistsRes.data) ? receptionistsRes.data : [];
+
+        // Store in state
+        setDoctors(doctors);
+        setPatients(patients);
+        setAppointments(appointments);
+        setReceptionists(receptionists);
+
+        // Filter today's appointments
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayAppointments = appointments.filter((apt: any) => {
+          const aptDate = new Date(apt.appointmentDate);
+          aptDate.setHours(0, 0, 0, 0);
+          return aptDate.getTime() === today.getTime();
+        });
+
+        // Filter pending appointments
+        const pendingAppointments = appointments.filter(
+          (apt: any) => apt.status === 'PENDING' || apt.status === 'pending'
+        );
+
+        setStats({
+          totalDoctors: doctors.length,
+          totalPatients: patients.length,
+          todayAppointments: todayAppointments.length,
+          pendingAppointments: pendingAppointments.length,
+          revenue: 0, // Revenue calculation would need billing data
+          receptionists: receptionists.length,
+        });
+      } catch (error) {
+        console.error("Failed to fetch clinic data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClinicData();
+  }, []);
 
   const recentAppointments = [
     { id: 1, patient: "Sarah Johnson", doctor: "Dr. Smith", time: "09:00 AM", status: "confirmed" },
@@ -42,10 +112,11 @@ export default function ClinicAdminDashboard() {
   ];
 
   const quickActions = [
-    { icon: UserPlus, label: "Add Doctor", color: "bg-blue-500", action: () => {} },
+    { icon: UserPlus, label: "Add Doctor", color: "bg-blue-500", action: () => navigate("/admin-dashboard/doctors/add") },
     { icon: Users, label: "Add Patient", color: "bg-green-500", action: () => {} },
     { icon: CalendarPlus, label: "New Appointment", color: "bg-purple-500", action: () => {} },
     { icon: UserCog, label: "Add Receptionist", color: "bg-orange-500", action: () => navigate("/admin-dashboard/receptionists/add") },
+    { icon: MessageCircle, label: "AI Medical Assistant", color: "bg-blue-500", action: () => navigate("/chatbot") },
   ];
 
   return (
@@ -69,7 +140,7 @@ export default function ClinicAdminDashboard() {
         <nav className="p-4 space-y-1">
           {[
             { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-            { id: "doctors", label: "Doctors", icon: Stethoscope, badge: stats.totalDoctors },
+            { id: "doctors", label: "Doctors", icon: Stethoscope, badge: stats.totalDoctors, route: "/admin-dashboard/doctors" },
             { id: "patients", label: "Patients", icon: Users, badge: stats.totalPatients },
             { id: "appointments", label: "Appointments", icon: Calendar, badge: stats.pendingAppointments },
             { id: "receptionists", label: "Receptionists", icon: UserCog },
@@ -78,8 +149,8 @@ export default function ClinicAdminDashboard() {
             <button
               key={item.id}
               onClick={() => {
-                if (item.id === "receptionists") {
-                  navigate("/admin-dashboard/receptionists");
+                if (item.route) {
+                  navigate(item.route);
                 } else {
                   setActiveSection(item.id);
                 }
@@ -163,6 +234,14 @@ export default function ClinicAdminDashboard() {
         {activeSection === "dashboard" && (
           <div className="p-8">
 
+            {loading && (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            )}
+
+            {!loading && (
+              <>
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <div className="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition">
@@ -322,11 +401,191 @@ export default function ClinicAdminDashboard() {
 
               </div>
             </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Receptionists Section */}
+        {activeSection === "receptionists" && (
+          <div className="p-8">
+            <div className="mb-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Receptionist Management</h3>
+                  <p className="text-gray-600 mt-2">
+                    Manage your clinic's reception staff
+                  </p>
+                </div>
+                
+                <button
+                  onClick={() => navigate("/admin-dashboard/receptionists/add")}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  <UserPlus size={20} />
+                  Add Receptionist
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-md p-8">
+                {receptionists.length > 0 ? (
+                  <div className="space-y-4">
+                    {receptionists.map((receptionist: any) => (
+                      <div
+                        key={receptionist.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                            <UserCog className="text-orange-600" size={24} />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900">{receptionist.name}</p>
+                            <p className="text-sm text-gray-500">{receptionist.email}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          {receptionist.phone && (
+                            <p className="text-sm text-gray-600">{receptionist.phone}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center py-12">
+                    No receptionists found. Add your first receptionist to get started.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Patients Section */}
+        {activeSection === "patients" && (
+          <div className="p-8">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold text-gray-900">Patient Management</h3>
+              <p className="text-gray-600 mt-2">
+                View and manage patient records
+              </p>
+            </div>
+
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-md p-8">
+                {patients.length > 0 ? (
+                  <div className="space-y-4">
+                    {patients.map((patient: any) => (
+                      <div
+                        key={patient.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <Users className="text-green-600" size={24} />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900">{patient.name}</p>
+                            <p className="text-sm text-gray-500">{patient.email}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          {patient.phone && (
+                            <p className="text-sm text-gray-600">{patient.phone}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center py-12">
+                    No patients found.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Appointments Section */}
+        {activeSection === "appointments" && (
+          <div className="p-8">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold text-gray-900">Appointments</h3>
+              <p className="text-gray-600 mt-2">
+                Schedule and track appointments
+              </p>
+            </div>
+
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-md p-8">
+                {appointments.length > 0 ? (
+                  <div className="space-y-4">
+                    {appointments.map((appointment: any) => (
+                      <div
+                        key={appointment.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <Calendar className="text-purple-600" size={24} />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900">
+                              {appointment.patient?.name || 'Patient'} - {appointment.doctor?.name || 'Doctor'}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime || 'Time TBD'}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span
+                            className={`inline-flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full ${
+                              appointment.status === "CONFIRMED" || appointment.status === "confirmed"
+                                ? "bg-green-100 text-green-700"
+                                : appointment.status === "PENDING" || appointment.status === "pending"
+                                ? "bg-orange-100 text-orange-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {appointment.status === "CONFIRMED" || appointment.status === "confirmed" ? <CheckCircle size={12} /> : null}
+                            {appointment.status === "PENDING" || appointment.status === "pending" ? <Clock size={12} /> : null}
+                            {appointment.status === "CANCELLED" || appointment.status === "cancelled" ? <AlertCircle size={12} /> : null}
+                            {appointment.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center py-12">
+                    No appointments found.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
 
         {/* Placeholder for other sections */}
-        {activeSection !== "dashboard" && (
+        {activeSection !== "dashboard" && activeSection !== "receptionists" && activeSection !== "patients" && activeSection !== "appointments" && (
           <div className="p-12 flex justify-center">
             <div className="bg-white rounded-xl shadow-sm border p-12 text-center w-full max-w-2xl">
               <h3 className="text-2xl font-bold mb-2">

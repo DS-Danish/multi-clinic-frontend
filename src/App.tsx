@@ -15,6 +15,9 @@ import SuperAdminDashboard from "./pages/Super-admin";
 import AdminDashboard from "./pages/ClinicAdminDashboard";
 import ReceptionistsPage from "./pages/clinic-admin/receptionists/index";
 import AddReceptionistPage from "./pages/clinic-admin/receptionists/add";
+import DoctorsPage from "./pages/clinic-admin/doctors/index";
+import AddDoctorPage from "./pages/clinic-admin/doctors/add";
+import ChatbotPage from "./pages/ChatbotPage";
 import { getCurrentUser, getToken } from "./utils/auth";
 import ToastProvider from "./components/ui/ToastProvider";
 
@@ -43,7 +46,15 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
-
+        {/* Chatbot - Available to all authenticated users */}
+        <Route
+          path="/chatbot"
+          element={
+            <Guard allow={["SYSTEM_ADMIN", "CLINIC_ADMIN", "DOCTOR", "PATIENT", "RECEPTIONIST"]}>
+              <ChatbotPage />
+            </Guard>
+          }
+        />
         {/* Doctor */}
         <Route
           path="/doctor-dashboard"
@@ -146,6 +157,22 @@ export default function App() {
           element={
             <Guard allow={["CLINIC_ADMIN"]}>
               <AddReceptionistPage />
+            </Guard>
+          }
+        />
+        <Route
+          path="/admin-dashboard/doctors"
+          element={
+            <Guard allow={["CLINIC_ADMIN"]}>
+              <DoctorsPage />
+            </Guard>
+          }
+        />
+        <Route
+          path="/admin-dashboard/doctors/add"
+          element={
+            <Guard allow={["CLINIC_ADMIN"]}>
+              <AddDoctorPage />
             </Guard>
           }
         />
