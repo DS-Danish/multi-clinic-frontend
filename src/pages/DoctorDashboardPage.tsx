@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getCurrentUser } from "../utils/auth";
+import { MessageCircle } from "lucide-react";
 import DoctorLayout from "../components/DoctorLayout";
 
 import {
@@ -81,6 +82,14 @@ export default function DoctorDashboardPage() {
               <button className="w-full flex items-center gap-3 p-3 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 transition">
                 <FileText className="w-5 h-5" />
                 <span>Create Report</span>
+              </button>
+
+              <button 
+                onClick={() => window.location.href = "/chatbot"}
+                className="w-full flex items-center gap-3 p-3 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 transition"
+              >
+                <MessageCircle className="w-5 h-5" />
+                <span>AI Medical Assistant</span>
               </button>
             </div>
           </div>

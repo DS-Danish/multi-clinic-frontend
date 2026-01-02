@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, UserPlus, Loader2 } from "lucide-react";
+import { 
+  ArrowLeft, 
+  UserPlus, 
+  Loader2,
+  LayoutDashboard,
+  Users,
+  Calendar,
+  Stethoscope,
+  UserCog,
+  Settings,
+  LogOut
+} from "lucide-react";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import { ClinicAdminAPI, AddReceptionistDto } from "../../../services/clinicAdmin.service";
@@ -79,26 +90,83 @@ export default function AddReceptionistPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/admin-dashboard")}
-            className="mb-4"
-          >
-            <ArrowLeft className="mr-2" size={20} />
-            Back to Dashboard
-          </Button>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <UserPlus size={32} className="text-blue-600" />
-            Add New Receptionist
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Create a new receptionist account for your clinic
-          </p>
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <div className="w-72 bg-white shadow-xl border-r border-gray-200">
+        <div className="p-6 border-b border-gray-200 bg-gradient-to-br from-blue-50 to-white">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+              <Stethoscope className="text-white" size={24} />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-gray-800">City Medical Center</h1>
+              <p className="text-sm text-gray-500">Clinic Admin Portal</p>
+            </div>
+          </div>
         </div>
+
+        {/* Sidebar Navigation */}
+        <nav className="p-4 space-y-1">
+          {[
+            { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/admin-dashboard" },
+            { id: "doctors", label: "Doctors", icon: Stethoscope, path: "/admin-dashboard" },
+            { id: "patients", label: "Patients", icon: Users, path: "/admin-dashboard" },
+            { id: "appointments", label: "Appointments", icon: Calendar, path: "/admin-dashboard" },
+            { id: "receptionists", label: "Receptionists", icon: UserCog, path: "/admin-dashboard", active: true },
+            { id: "settings", label: "Settings", icon: Settings, path: "/admin-dashboard" },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => navigate(item.path)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                item.active
+                  ? "bg-blue-50 text-blue-600 shadow-sm"
+                  : "text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              <item.icon size={20} />
+              <span className="font-medium">{item.label}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className="absolute bottom-0 w-72 p-4 border-t border-gray-200 bg-white">
+          <button
+            onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("currentUser");
+              window.location.href = "/login";
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-all"
+          >
+            <LogOut size={20} />
+            <span className="font-medium">Logout</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        <div className="p-6">
+          <div className="max-w-2xl mx-auto">
+            {/* Header */}
+            <div className="mb-6">
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/admin-dashboard")}
+                className="mb-4"
+              >
+                <ArrowLeft className="mr-2" size={20} />
+                Back to Dashboard
+              </Button>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <UserPlus size={32} className="text-blue-600" />
+                Add New Receptionist
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Create a new receptionist account for your clinic
+              </p>
+            </div>
 
         {/* Form Card */}
         <div className="bg-white rounded-lg shadow-md p-8">
@@ -212,6 +280,8 @@ export default function AddReceptionistPage() {
               </Button>
             </div>
           </form>
+        </div>
+          </div>
         </div>
       </div>
     </div>
