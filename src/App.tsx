@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 import Dashboard from "./pages/dashboard";
 import DoctorDashboardPage from "./pages/DoctorDashboardPage";
 import PatientDetailPage from "./pages/PatientDetailPage";
@@ -12,6 +13,8 @@ import BillDetailPage from "./pages/BillDetailPage";
 import CreateBillPage from "./pages/CreateBillPage";
 import SuperAdminDashboard from "./pages/Super-admin";
 import AdminDashboard from "./pages/ClinicAdminDashboard";
+import ReceptionistsPage from "./pages/clinic-admin/receptionists/index";
+import AddReceptionistPage from "./pages/clinic-admin/receptionists/add";
 import { getCurrentUser, getToken } from "./utils/auth";
 import ToastProvider from "./components/ui/ToastProvider";
 
@@ -39,6 +42,7 @@ export default function App() {
           <Route path="/" element={<LoginPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
 
         {/* Doctor */}
         <Route
@@ -126,6 +130,22 @@ export default function App() {
           element={
             <Guard allow={["CLINIC_ADMIN"]}>
               <AdminDashboard />
+            </Guard>
+          }
+        />
+        <Route
+          path="/admin-dashboard/receptionists"
+          element={
+            <Guard allow={["CLINIC_ADMIN"]}>
+              <ReceptionistsPage />
+            </Guard>
+          }
+        />
+        <Route
+          path="/admin-dashboard/receptionists/add"
+          element={
+            <Guard allow={["CLINIC_ADMIN"]}>
+              <AddReceptionistPage />
             </Guard>
           }
         />

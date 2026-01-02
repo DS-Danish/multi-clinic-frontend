@@ -25,3 +25,8 @@ export async function loginUser(payload: LoginPayload) {
 
   return res.data;
 }
+
+export async function verifyEmail(token: string) {
+  const res = await api.get(`/auth/verify-email?token=${token}`);
+  return res.data;
+}

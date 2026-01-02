@@ -278,8 +278,132 @@ export default function SuperAdminDashboard() {
         ============================ */}
         {activeTab === "create" && (
           <div className="p-8">
-            {/* your entire existing create form — unchanged */}
-            {/* (not repeating here for readability, but full code preserved above) */}
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white rounded-xl shadow-sm border p-8">
+                <h3 className="text-xl font-semibold mb-6">Clinic Information</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Clinic Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.clinicName}
+                      onChange={(e) => handleInputChange("clinicName", e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      placeholder="Enter clinic name"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Clinic Code <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.clinicCode}
+                      onChange={(e) => handleInputChange("clinicCode", e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      placeholder="e.g., CLN001"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Clinic Email <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.clinicEmail}
+                      onChange={(e) => handleInputChange("clinicEmail", e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      placeholder="clinic@example.com"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Clinic Phone
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.clinicPhone}
+                      onChange={(e) => handleInputChange("clinicPhone", e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      placeholder="+1234567890"
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t pt-8">
+                  <h3 className="text-xl font-semibold mb-6">Admin Account Details</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Admin Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.adminName}
+                        onChange={(e) => handleInputChange("adminName", e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        placeholder="Enter admin name"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Admin Email <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        value={formData.adminEmail}
+                        onChange={(e) => handleInputChange("adminEmail", e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        placeholder="admin@example.com"
+                        required
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Admin Password <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        value={formData.adminPassword}
+                        onChange={(e) => handleInputChange("adminPassword", e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        placeholder="Enter admin password"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 mt-8 pt-6 border-t">
+                  <button
+                    onClick={() => setActiveTab("dashboard")}
+                    className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleCreate}
+                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Plus size={20} />
+                    Create Clinic & Admin
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
