@@ -10,6 +10,8 @@ import {
   Bell,
   Clock,
   MessageCircle,
+  FileText,
+  ExternalLink,
 } from "lucide-react";
 
 import api from "../services/api";
@@ -18,6 +20,7 @@ import { useToast } from "../components/ui/ToastProvider";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import EditAppointmentDialog from "../components/ui/EditAppointmentDialog";
 import { AppointmentStatus } from "../types/appointment.types";
+import { ReportService, PatientReportResponse } from "../services/report.service";
 
 export default function PatientDetailPage() {
   const toast = useToast();
@@ -36,6 +39,11 @@ export default function PatientDetailPage() {
 
   // Notifications state
   const [notifications, setNotifications] = useState<any[]>([]);
+  
+  // Reports state
+  const [reports, setReports] = useState<PatientReportResponse[]>([]);
+  const [selectedReport, setSelectedReport] = useState<PatientReportResponse | null>(null);
+  const [viewReportDialog, setViewReportDialog] = useState(false);
   
   // Cancel confirmation state
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -70,6 +78,8 @@ export default function PatientDetailPage() {
     loadClinics();
     loadAppointments();
     loadNotifications();
+    loadReports();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadClinics = async () => {
@@ -90,6 +100,16 @@ export default function PatientDetailPage() {
   const loadNotifications = async () => {
     const res = await api.get(`/notifications/${user.id}`);
     setNotifications(res.data);
+  };
+
+  const loadReports = async () => {
+    if (!user?.id) return;
+    try {
+      const data = await ReportService.getPatientReports(user.id);
+      setReports(data);
+    } catch (err) {
+      console.error("Error loading reports", err);
+    }
   };
 
   // ---------------------------------------
@@ -267,7 +287,7 @@ export default function PatientDetailPage() {
 
           {/* TABS */}
           <div className="border-b border-gray-200 flex px-8">
-            {["overview", "appointments", "notifications"].map((tab) => (
+            {["overview", "appointments", "reports", "notifications"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -578,6 +598,73 @@ export default function PatientDetailPage() {
         {/* ---------------------------- */}
         {/* TAB 3: NOTIFICATIONS */}
         {/* ---------------------------- */}
+        {/* REPORTS TAB */}
+        {/* ---------------------------- */}
+        {activeTab === "reports" && (
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <FileText className="w-6 h-6 text-purple-600" />
+              Medical Reports
+            </h3>
+
+            {reports.length === 0 ? (
+              <p className="text-gray-600">No medical reports available yet.</p>
+            ) : (
+              <div className="space-y-4">
+                {reports.map((reportData) => (
+                  <div
+                    key={reportData.report.id}
+                    className="border rounded-lg p-4 hover:bg-gray-50 transition"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-5 h-5 text-purple-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900">{reportData.report.title}</h4>
+                          <p className="text-sm text-gray-600 mt-0.5">
+                            {reportData.doctor.name} • {reportData.clinic.name}
+                          </p>
+                          {reportData.report.diagnosis && (
+                            <p className="text-sm text-gray-600 mt-1">
+                              {reportData.report.diagnosis.substring(0, 100)}
+                              {reportData.report.diagnosis.length > 100 ? "..." : ""}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(reportData.report.createdAt).toLocaleDateString()}
+                            </span>
+                            {reportData.report.updatedAt !== reportData.report.createdAt && (
+                              <span>
+                                Updated: {new Date(reportData.report.updatedAt).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setSelectedReport(reportData);
+                          setViewReportDialog(true);
+                        }}
+                        className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ---------------------------- */}
+        {/* NOTIFICATIONS TAB */}
+        {/* ---------------------------- */}
         {activeTab === "notifications" && (
           <div className="bg-white rounded-xl shadow-md p-6">
             <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
@@ -626,6 +713,101 @@ export default function PatientDetailPage() {
         }}
         onConfirm={handleCancelAppointment}
       />
+
+      {/* View Report Dialog */}
+      {viewReportDialog && selectedReport && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {selectedReport.report.title}
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    {selectedReport.doctor.name} • {selectedReport.clinic.name}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Created: {new Date(selectedReport.report.createdAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setViewReportDialog(false)}
+                className="text-gray-400 hover:text-gray-600 transition text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Report Content
+                </h3>
+                <p className="text-blue-800 whitespace-pre-wrap leading-relaxed">
+                  {selectedReport.report.content}
+                </p>
+              </div>
+              
+              {selectedReport.report.diagnosis && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-red-900 mb-2">Diagnosis</h3>
+                  <p className="text-red-800 whitespace-pre-wrap leading-relaxed">
+                    {selectedReport.report.diagnosis}
+                  </p>
+                </div>
+              )}
+              
+              {selectedReport.report.prescription && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-green-900 mb-2">Prescription</h3>
+                  <p className="text-green-800 whitespace-pre-wrap leading-relaxed">
+                    {selectedReport.report.prescription}
+                  </p>
+                </div>
+              )}
+              
+              {selectedReport.report.recommendations && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-yellow-900 mb-2">Recommendations</h3>
+                  <p className="text-yellow-800 whitespace-pre-wrap leading-relaxed">
+                    {selectedReport.report.recommendations}
+                  </p>
+                </div>
+              )}
+              
+              {selectedReport.report.fileUrl && (
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 mb-2">Attachment</h3>
+                  <a
+                    href={selectedReport.report.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline flex items-center gap-2"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    {selectedReport.report.fileUrl}
+                  </a>
+                </div>
+              )}
+              
+              <div className="pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => setViewReportDialog(false)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
