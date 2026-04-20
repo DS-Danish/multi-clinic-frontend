@@ -136,7 +136,7 @@ export default function ChatbotPage() {
                 AI Medical Assistant
               </h1>
               <p className="text-gray-600 mt-1">
-                Upload medical documents and clinic resources to get instant answers
+                Ask questions about heart disease, skin conditions, and diabetes — or upload your own documents
               </p>
             </div>
           </div>
@@ -151,7 +151,7 @@ export default function ChatbotPage() {
                   <p className="text-sm text-gray-500">
                     {uploadedFiles.length > 0
                       ? `${uploadedFiles.length} file(s) uploaded: ${uploadedFiles.slice(0, 3).join(", ")}${uploadedFiles.length > 3 ? `... +${uploadedFiles.length - 3} more` : ""}`
-                      : "Select multiple PDF, TXT, or MD files to get started"}
+                      : "Optionally upload PDF, TXT, or MD files to add extra context"}
                   </p>
                 </div>
               </div>
@@ -201,10 +201,25 @@ export default function ChatbotPage() {
           <div className="h-[500px] overflow-y-auto p-6 space-y-4 bg-gray-50">
             {messages.length === 0 ? (
               <div className="h-full flex items-center justify-center">
-                <div className="text-center text-gray-400">
+                <div className="text-center text-gray-400 max-w-sm">
                   <MessageCircle size={64} className="mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium">No messages yet</p>
-                  <p className="text-sm">Upload a document and start asking questions</p>
+                  <p className="text-lg font-medium text-gray-500">Start a conversation</p>
+                  <p className="text-sm mt-2">Ask about heart disease, skin conditions, or diabetes. You can also upload your own documents for additional context.</p>
+                  <div className="mt-4 space-y-2 text-left">
+                    {[
+                      "What are common symptoms of heart disease?",
+                      "Tell me about patients with psoriasis.",
+                      "What glucose levels indicate diabetes?",
+                    ].map((q) => (
+                      <button
+                        key={q}
+                        onClick={() => setInputMessage(q)}
+                        className="w-full text-left text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-3 py-2 transition-colors"
+                      >
+                        💡 {q}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -247,7 +262,7 @@ export default function ChatbotPage() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask a question about your medical documents..."
+                placeholder="Ask about heart disease, skin conditions, diabetes..."
                 className="flex-1"
                 disabled={loading}
               />
@@ -267,7 +282,7 @@ export default function ChatbotPage() {
               </Button>
             </div>
             <p className="text-xs text-gray-500 mt-2">
-              💡 Ask questions about uploaded documents. Press Enter to send.
+              💡 Ask about heart disease, skin conditions, or diabetes. Press Enter to send.
             </p>
           </div>
         </div>
@@ -279,10 +294,9 @@ export default function ChatbotPage() {
             <div>
               <p className="font-medium text-blue-900">How to use:</p>
               <ol className="text-sm text-blue-800 mt-2 space-y-1 list-decimal list-inside">
-                <li>Upload one or multiple medical documents or clinic resources (PDF, TXT, or MD format)</li>
-                <li>Wait for the documents to be processed</li>
-                <li>Ask questions about the uploaded content</li>
-                <li>Get AI-powered responses based on all your documents</li>
+                <li>Ask any question about heart disease, dermatology, or diabetes directly — no upload needed</li>
+                <li>Optionally upload PDF, TXT, or MD documents to add your own clinic resources as context</li>
+                <li>Get AI-powered responses backed by medical datasets</li>
               </ol>
               <p className="text-xs text-blue-700 mt-3">
                 <strong>Note:</strong> Make sure the FastAPI backend is running at{" "}
