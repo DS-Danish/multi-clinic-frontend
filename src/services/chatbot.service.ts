@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getToken } from "../utils/auth";
 
 // FastAPI backend URL - update this to match your Python backend
 const CHATBOT_API_URL = "http://127.0.0.1:8000";
@@ -8,6 +9,16 @@ const chatbotApi = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+// Attach the NestJS JWT token to every chatbot request
+chatbotApi.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export interface ChatMessage {
