@@ -4,22 +4,19 @@ import { Label } from "../components/ui/label";
 import { Button } from "../components/ui/button";
 import { registerUser } from "../utils/auth";
 import type { UserRole } from "../utils/auth";
-import { Stethoscope, UserCheck, Users, CheckCircle } from "lucide-react";
-import "../styles/signup.css";
+import { Stethoscope, UserCheck, Users, CheckCircle, Mail } from "lucide-react";
 import { useToast } from "../components/ui/ToastProvider";
 
 export default function SignupPage() {
   const toast = useToast();
+
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
-    role: "PATIENT" as UserRole, // default
+    role: "PATIENT" as UserRole,
   });
 
-  // -----------------------------
-  // Signup API Handler
-  // -----------------------------
   const handleSignup = async (): Promise<void> => {
     const res = await registerUser({
       name: form.name,
@@ -44,9 +41,6 @@ export default function SignupPage() {
     }
   };
 
-  // -----------------------------
-  // Role Options
-  // -----------------------------
   const roles = [
     {
       id: "PATIENT" as UserRole,
@@ -73,7 +67,6 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* LEFT SIDE PANEL */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 p-12 flex-col justify-between text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
 
@@ -121,21 +114,23 @@ export default function SignupPage() {
         <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl"></div>
       </div>
 
-      {/* RIGHT SIDE — FORM */}
       <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
               <Stethoscope className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800">ClinicConnect AI</h1>
+            <h1 className="text-2xl font-bold text-gray-800">
+              ClinicConnect AI
+            </h1>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h2 className="text-3xl font-bold mb-2 text-gray-800">Create Account</h2>
+            <h2 className="text-3xl font-bold mb-2 text-gray-800">
+              Create Account
+            </h2>
             <p className="text-gray-500 mb-8">Sign up to get started</p>
 
-            {/* NAME */}
             <div className="mb-4">
               <Label className="text-gray-700 font-medium">Full Name</Label>
               <Input
@@ -147,7 +142,6 @@ export default function SignupPage() {
               />
             </div>
 
-            {/* EMAIL */}
             <div className="mb-4">
               <Label className="text-gray-700 font-medium">Email Address</Label>
               <Input
@@ -159,21 +153,24 @@ export default function SignupPage() {
               />
             </div>
 
-            {/* PASSWORD */}
             <div className="mb-4">
               <Label className="text-gray-700 font-medium">Password</Label>
               <Input
                 type="password"
                 value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, password: e.target.value })
+                }
                 placeholder="Create a strong password"
                 className="mt-1.5 h-11"
               />
             </div>
 
-            {/* ROLE SELECT */}
             <div className="mb-4">
-              <Label className="text-gray-700 font-medium mb-3 block">I am a...</Label>
+              <Label className="text-gray-700 font-medium mb-3 block">
+                I am a...
+              </Label>
+
               <div className="grid grid-cols-1 gap-3">
                 {roles.map((role) => {
                   const Icon = role.icon;
@@ -199,7 +196,9 @@ export default function SignupPage() {
                       </div>
 
                       <div className="flex-1 text-left">
-                        <div className="font-semibold text-base">{role.label}</div>
+                        <div className="font-semibold text-base">
+                          {role.label}
+                        </div>
                         <div
                           className={`text-sm ${
                             isSelected ? "text-white/90" : "text-gray-500"
@@ -216,7 +215,6 @@ export default function SignupPage() {
               </div>
             </div>
 
-            {/* SIGNUP BUTTON */}
             <Button
               className="w-full h-11 mt-6 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold shadow-lg"
               onClick={handleSignup}
@@ -243,12 +241,30 @@ export default function SignupPage() {
             </p>
           </div>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
-            Need help? Contact{" "}
-            <a href="#" className="text-blue-600 font-medium">
-              support@ClinicConnect AI
-            </a>
-          </p>
+          <div className="mt-6 bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <Mail className="w-5 h-5 text-blue-600" />
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-gray-800">
+                  Need help or have a query?
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Contact our support team for account, appointment, or platform
+                  related queries.
+                </p>
+
+                <a
+                  href="/contact-us"
+                  className="inline-flex mt-3 text-sm font-semibold text-blue-600 hover:text-blue-700"
+                >
+                  Go to Contact Us
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

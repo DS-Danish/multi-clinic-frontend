@@ -230,7 +230,7 @@ A: Clear your browser cache, close unnecessary tabs, check your internet connect
 A: Verify you're using the correct email and password. Try resetting your password. Clear browser cache or try incognito mode. If still unable to access, contact IT support immediately.
 
 **Q: How do I report a system error?**
-A: Document the error (screenshot if possible), note what you were doing when it occurred, and report to IT support via email (itsupport@multiclinic.com) or phone. Include your name, role, and contact information.
+A: Document the error (screenshot if possible), note what you were doing when it occurred, and report to IT support via email (dsohail402@gmail.comm). Include your name, role, and contact information.
 
 **Q: Is my data backed up?**
 A: Yes, all system data is automatically backed up every hour. Daily full backups are stored securely off-site. In case of data loss, recovery is typically completed within 4 hours.

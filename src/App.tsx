@@ -2,11 +2,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
-import Dashboard from "./pages/dashboard";
 import DoctorDashboardPage from "./pages/DoctorDashboardPage";
 import PatientDetailPage from "./pages/PatientDetailPage";
 import ReceptionistPage from "./pages/receptionist";
-import DoctorPatientsPage from "./pages/doctor-patients"; 
+import DoctorPatientsPage from "./pages/doctor-patients";
 import DoctorAppointmentsPage from "./pages/doctor-appointments";
 import DoctorReportsPage from "./pages/doctor-reports";
 import BillDetailPage from "./pages/BillDetailPage";
@@ -18,6 +17,7 @@ import AddReceptionistPage from "./pages/clinic-admin/receptionists/add";
 import DoctorsPage from "./pages/clinic-admin/doctors/index";
 import AddDoctorPage from "./pages/clinic-admin/doctors/add";
 import ChatbotPage from "./pages/ChatbotPage";
+import ContactUs from "./pages/ContactUs";
 import { getCurrentUser, getToken } from "./utils/auth";
 import ToastProvider from "./components/ui/ToastProvider";
 
@@ -46,141 +46,154 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
-        {/* Chatbot - Available to all authenticated users */}
-        <Route
-          path="/chatbot"
-          element={
-            <Guard allow={["SYSTEM_ADMIN", "CLINIC_ADMIN", "DOCTOR", "PATIENT", "RECEPTIONIST"]}>
-              <ChatbotPage />
-            </Guard>
-          }
-        />
-        {/* Doctor */}
-        <Route
-          path="/doctor-dashboard"
-          element={
-            <Guard allow={["DOCTOR"]}>
-              <DoctorDashboardPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/doctor-patients"
-          element={
-            <Guard allow={["DOCTOR"]}>
-              <DoctorPatientsPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/doctor-appointments"
-          element={
-            <Guard allow={["DOCTOR"]}>
-              <DoctorAppointmentsPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/doctor-reports"
-          element={
-            <Guard allow={["DOCTOR"]}>
-              <DoctorReportsPage />
-            </Guard>
-          }
-        />
+          <Route path="/contact-us" element={<ContactUs />} />
 
-        {/* Patient */}
-        <Route
-          path="/patient-details"
-          element={
-            <Guard allow={["PATIENT"]}>
-              <PatientDetailPage />
-            </Guard>
-          }
-        />
+          <Route
+            path="/chatbot"
+            element={
+              <Guard
+                allow={[
+                  "SYSTEM_ADMIN",
+                  "CLINIC_ADMIN",
+                  "DOCTOR",
+                  "PATIENT",
+                  "RECEPTIONIST",
+                ]}
+              >
+                <ChatbotPage />
+              </Guard>
+            }
+          />
 
-        {/* Receptionist */}
-        <Route
-          path="/receptionist"
-          element={
-            <Guard allow={["RECEPTIONIST"]}>
-              <ReceptionistPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/billing/create"
-          element={
-            <Guard allow={["RECEPTIONIST"]}>
-              <CreateBillPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/billing/:billId"
-          element={
-            <Guard allow={["RECEPTIONIST"]}>
-              <BillDetailPage />
-            </Guard>
-          }
-        />
+          <Route
+            path="/doctor-dashboard"
+            element={
+              <Guard allow={["DOCTOR"]}>
+                <DoctorDashboardPage />
+              </Guard>
+            }
+          />
 
-        {/* System Admin */}
-        <Route
-          path="/super-admin"
-          element={
-            <Guard allow={["SYSTEM_ADMIN"]}>
-              <SuperAdminDashboard />
-            </Guard>
-          }
-        />
+          <Route
+            path="/doctor-patients"
+            element={
+              <Guard allow={["DOCTOR"]}>
+                <DoctorPatientsPage />
+              </Guard>
+            }
+          />
 
-        {/* Clinic Admin */}
-        <Route
-          path="/admin-dashboard"
-          element={
-            <Guard allow={["CLINIC_ADMIN"]}>
-              <AdminDashboard />
-            </Guard>
-          }
-        />
-        <Route
-          path="/admin-dashboard/receptionists"
-          element={
-            <Guard allow={["CLINIC_ADMIN"]}>
-              <ReceptionistsPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/admin-dashboard/receptionists/add"
-          element={
-            <Guard allow={["CLINIC_ADMIN"]}>
-              <AddReceptionistPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/admin-dashboard/doctors"
-          element={
-            <Guard allow={["CLINIC_ADMIN"]}>
-              <DoctorsPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/admin-dashboard/doctors/add"
-          element={
-            <Guard allow={["CLINIC_ADMIN"]}>
-              <AddDoctorPage />
-            </Guard>
-          }
-        />
+          <Route
+            path="/doctor-appointments"
+            element={
+              <Guard allow={["DOCTOR"]}>
+                <DoctorAppointmentsPage />
+              </Guard>
+            }
+          />
 
-        {/* Catch all */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </Router>
+          <Route
+            path="/doctor-reports"
+            element={
+              <Guard allow={["DOCTOR"]}>
+                <DoctorReportsPage />
+              </Guard>
+            }
+          />
+
+          <Route
+            path="/patient-details"
+            element={
+              <Guard allow={["PATIENT"]}>
+                <PatientDetailPage />
+              </Guard>
+            }
+          />
+
+          <Route
+            path="/receptionist"
+            element={
+              <Guard allow={["RECEPTIONIST"]}>
+                <ReceptionistPage />
+              </Guard>
+            }
+          />
+
+          <Route
+            path="/billing/create"
+            element={
+              <Guard allow={["RECEPTIONIST"]}>
+                <CreateBillPage />
+              </Guard>
+            }
+          />
+
+          <Route
+            path="/billing/:billId"
+            element={
+              <Guard allow={["RECEPTIONIST"]}>
+                <BillDetailPage />
+              </Guard>
+            }
+          />
+
+          <Route
+            path="/super-admin"
+            element={
+              <Guard allow={["SYSTEM_ADMIN"]}>
+                <SuperAdminDashboard />
+              </Guard>
+            }
+          />
+
+          <Route
+            path="/admin-dashboard"
+            element={
+              <Guard allow={["CLINIC_ADMIN"]}>
+                <AdminDashboard />
+              </Guard>
+            }
+          />
+
+          <Route
+            path="/admin-dashboard/receptionists"
+            element={
+              <Guard allow={["CLINIC_ADMIN"]}>
+                <ReceptionistsPage />
+              </Guard>
+            }
+          />
+
+          <Route
+            path="/admin-dashboard/receptionists/add"
+            element={
+              <Guard allow={["CLINIC_ADMIN"]}>
+                <AddReceptionistPage />
+              </Guard>
+            }
+          />
+
+          <Route
+            path="/admin-dashboard/doctors"
+            element={
+              <Guard allow={["CLINIC_ADMIN"]}>
+                <DoctorsPage />
+              </Guard>
+            }
+          />
+
+          <Route
+            path="/admin-dashboard/doctors/add"
+            element={
+              <Guard allow={["CLINIC_ADMIN"]}>
+                <AddDoctorPage />
+              </Guard>
+            }
+          />
+
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </Router>
     </ToastProvider>
   );
 }

@@ -134,7 +134,7 @@ All patient records must include:
 
 ### Technical Support
 - System support available Monday-Friday, 9 AM - 5 PM
-- Email support: support@multiclinic.com
+- Email support: dsohail402@gmail.com
 - Phone support: 1-800-CLINIC-HELP
 - Average response time: 4-6 hours for non-emergency issues
 
