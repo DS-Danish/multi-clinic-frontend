@@ -6,6 +6,7 @@ import {
   Users,
   FileText,
   Settings,
+  Phone,
   LogOut,
   Menu,
   X,
@@ -29,6 +30,7 @@ export default function DoctorLayout({ children, userName }: DoctorLayoutProps) 
     { label: "Patients", icon: Users, href: "/doctor-patients" },
     { label: "Reports", icon: FileText, href: "/doctor-reports" },
     { label: "Settings", icon: Settings, href: "/doctor-settings", disabled: true },
+    { label: "Contact", icon: Phone, href: "/contact-us" },
   ];
 
   const handleNavigation = (href: string, disabled?: boolean) => {

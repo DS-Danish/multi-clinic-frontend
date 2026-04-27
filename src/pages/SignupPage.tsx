@@ -4,7 +4,7 @@ import { Label } from "../components/ui/label";
 import { Button } from "../components/ui/button";
 import { registerUser } from "../utils/auth";
 import type { UserRole } from "../utils/auth";
-import { Stethoscope, UserCheck, Users, CheckCircle, Mail } from "lucide-react";
+import { Stethoscope, UserCheck, Users, CheckCircle } from "lucide-react";
 import { useToast } from "../components/ui/ToastProvider";
 
 export default function SignupPage() {
@@ -239,31 +239,6 @@ export default function SignupPage() {
                 Sign In
               </a>
             </p>
-          </div>
-
-          <div className="mt-6 bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                <Mail className="w-5 h-5 text-blue-600" />
-              </div>
-
-              <div>
-                <h3 className="text-sm font-semibold text-gray-800">
-                  Need help or have a query?
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  Contact our support team for account, appointment, or platform
-                  related queries.
-                </p>
-
-                <a
-                  href="/contact-us"
-                  className="inline-flex mt-3 text-sm font-semibold text-blue-600 hover:text-blue-700"
-                >
-                  Go to Contact Us
-                </a>
-              </div>
-            </div>
           </div>
         </div>
       </div>

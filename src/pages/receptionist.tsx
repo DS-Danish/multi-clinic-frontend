@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { ReceptionistAPI } from "../services/receptionist.service";
-import { getCurrentUser, logoutUser } from "../utils/auth";
+import { logoutUser } from "../utils/auth";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import EditAppointmentModal from "../components/ui/EditAppointmentDialog";
 import { useToast } from "../components/ui/ToastProvider";
 import { useNavigate } from "react-router-dom";
-import { AppointmentStatus } from "../types/appointment.types";
 
 type TPatient = {
   id: string;
@@ -30,7 +29,6 @@ export default function ReceptionistPage() {
   const [patients, setPatients] = useState<TPatient[]>([]);
   const [appointments, setAppointments] = useState<TAppointment[]>([]);
   const [myClinic, setMyClinic] = useState<any>(null);
-  const [clinics, setClinics] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<any[]>([]);
   const [availability, setAvailability] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -39,21 +37,13 @@ export default function ReceptionistPage() {
   const [editData, setEditData] = useState<any>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  // Pagination
   const [appointmentPage, setAppointmentPage] = useState(1);
   const APPOINT_LIMIT = 5;
 
   const [patientPage, setPatientPage] = useState(1);
   const PATIENT_LIMIT = 10;
 
-  // Search
   const [search, setSearch] = useState("");
-
-  // Appointment filters
-  const [appointmentDoctorFilter, setAppointmentDoctorFilter] =
-    useState("");
-  const [appointmentDateFilter, setAppointmentDateFilter] =
-    useState("");
 
   const [form, setForm] = useState({
     clinicId: "",
@@ -64,9 +54,6 @@ export default function ReceptionistPage() {
     notes: "",
   });
 
-  const user = getCurrentUser();
-
-  // Load Receptionist's Clinic
   useEffect(() => {
     ReceptionistAPI.getMyClinic()
       .then((res) => {
@@ -76,21 +63,12 @@ export default function ReceptionistPage() {
       .catch(() => showError("Failed to load clinic"));
   }, []);
 
-  // Load Clinics
-  useEffect(() => {
-    ReceptionistAPI.listClinics()
-      .then((res) => setClinics(res.data))
-      .catch(() => showError("Failed to load clinics"));
-  }, []);
-
-  // Load Patients
   useEffect(() => {
     ReceptionistAPI.listPatients()
       .then((res) => setPatients(res.data))
       .catch(() => showError("Failed to load patients"));
   }, []);
 
-  // Load Appointments
   useEffect(() => {
     ReceptionistAPI.listPendingAppointments()
       .then((res) => {
@@ -100,12 +78,12 @@ export default function ReceptionistPage() {
           doctorId: a.doctorId,
           startTime: a.startTime,
         }));
+
         setAppointments(list);
       })
       .catch(() => showError("Failed to load appointments"));
   }, []);
 
-  // Load doctors on clinic change
   useEffect(() => {
     if (!form.clinicId) {
       setDoctors([]);
@@ -117,7 +95,6 @@ export default function ReceptionistPage() {
       .catch(() => showError("Failed to load doctors"));
   }, [form.clinicId]);
 
-  // Load availability on doctor change
   useEffect(() => {
     if (!form.doctorId) {
       setAvailability([]);
@@ -129,14 +106,13 @@ export default function ReceptionistPage() {
       .catch(() => showError("Failed to load availability"));
   }, [form.doctorId]);
 
-  // Create appointment
-  const createAppointment = async () => {
+  const createAppointment = async (): Promise<void> => {
     try {
       await ReceptionistAPI.createAppointment(form);
       toast.show("Appointment scheduled successfully", "success");
 
       setForm({
-        clinicId: "",
+        clinicId: myClinic?.id || "",
         doctorId: "",
         patientId: "",
         startTime: "",
@@ -148,8 +124,7 @@ export default function ReceptionistPage() {
     }
   };
 
-  // Accept appointment
-  const acceptAppointment = async (id: string) => {
+  const acceptAppointment = async (id: string): Promise<void> => {
     try {
       await ReceptionistAPI.acceptAppointment(id);
       setAppointments((prev) => prev.filter((a) => a.id !== id));
@@ -159,14 +134,14 @@ export default function ReceptionistPage() {
     }
   };
 
-  // Cancel appointment
-  const handleCancel = (id: string) => {
+  const handleCancel = (id: string): void => {
     setSelectedId(id);
     setConfirmOpen(true);
   };
 
-  const confirmCancel = async () => {
+  const confirmCancel = async (): Promise<void> => {
     if (!selectedId) return;
+
     try {
       await ReceptionistAPI.cancelAppointment(selectedId);
       setAppointments((prev) => prev.filter((a) => a.id !== selectedId));
@@ -174,16 +149,16 @@ export default function ReceptionistPage() {
     } catch {
       showError("Failed to cancel appointment");
     }
+
     setConfirmOpen(false);
   };
 
-  // Edit
-  const handleEdit = (appt: any) => {
+  const handleEdit = (appt: any): void => {
     setEditData(appt);
     setEditOpen(true);
   };
 
-  const saveEdit = async (updated: any) => {
+  const saveEdit = async (updated: any): Promise<void> => {
     try {
       await ReceptionistAPI.updateAppointment(updated.id, updated);
       toast.show("Appointment updated", "success");
@@ -193,7 +168,6 @@ export default function ReceptionistPage() {
     }
   };
 
-  // Patients
   const filteredPatients = patients.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -203,26 +177,13 @@ export default function ReceptionistPage() {
     patientPage * PATIENT_LIMIT
   );
 
-  // Appointments
-  const filteredAppointments = appointments
-    .filter((a) =>
-      appointmentDoctorFilter ? a.doctorId === appointmentDoctorFilter : true
-    )
-    .filter((a) =>
-      appointmentDateFilter
-        ? a.startTime.startsWith(appointmentDateFilter)
-        : true
-    );
-
-  const paginatedAppointments = filteredAppointments.slice(
+  const paginatedAppointments = appointments.slice(
     (appointmentPage - 1) * APPOINT_LIMIT,
     appointmentPage * APPOINT_LIMIT
   );
 
-  // =====================================================================
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
       <header className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
@@ -234,42 +195,42 @@ export default function ReceptionistPage() {
             </p>
           </div>
 
-          <button
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg"
-            onClick={() => {
-              logoutUser();
-              window.location.href = "/login";
-            }}
-          >
-            Logout
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium"
+              onClick={() => navigate("/chatbot")}
+            >
+              AI Chatbot
+            </button>
+
+            <button
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium"
+              onClick={() => {
+                logoutUser();
+                window.location.href = "/login";
+              }}
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-8 flex-1 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* LEFT SIDE */}
           <div className="lg:col-span-2 space-y-8">
-            {/* APPOINTMENTS */}
             <div className="bg-white rounded-xl shadow-md">
               <div className="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4 text-white font-semibold text-xl">
-                Pending Appointments ({filteredAppointments.length})
+                Pending Appointments ({appointments.length})
               </div>
 
               <div className="p-6 space-y-4">
                 {paginatedAppointments.map((a) => {
-                  const patient = patients.find(
-                    (p) => p.name === a.patientName
-                  );
+                  const patient = patients.find((p) => p.name === a.patientName);
 
                   return (
-                    <div
-                      key={a.id}
-                      className="border p-4 rounded-lg shadow-sm"
-                    >
-                      <h3 className="font-semibold text-lg">
-                        {a.patientName}
-                      </h3>
+                    <div key={a.id} className="border p-4 rounded-lg shadow-sm">
+                      <h3 className="font-semibold text-lg">{a.patientName}</h3>
                       <p className="text-gray-600 text-sm">{a.startTime}</p>
 
                       <div className="mt-4 flex gap-2 flex-wrap">
@@ -294,7 +255,6 @@ export default function ReceptionistPage() {
                           ✕ Cancel
                         </button>
 
-                        {/* BILLING BUTTON */}
                         <button
                           className="bg-purple-600 text-white px-4 py-2 rounded-lg"
                           onClick={() =>
@@ -317,26 +277,20 @@ export default function ReceptionistPage() {
                 <div className="flex justify-center items-center mt-4 space-x-4">
                   <button
                     disabled={appointmentPage === 1}
-                    onClick={() =>
-                      setAppointmentPage((p) => p - 1)
-                    }
+                    onClick={() => setAppointmentPage((p) => p - 1)}
                     className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
 
                   <span className="text-gray-700 font-medium">
-                    Page {appointmentPage} of {Math.ceil(filteredAppointments.length / APPOINT_LIMIT) || 1}
+                    Page {appointmentPage} of{" "}
+                    {Math.ceil(appointments.length / APPOINT_LIMIT) || 1}
                   </span>
 
                   <button
-                    disabled={
-                      appointmentPage * APPOINT_LIMIT >=
-                      filteredAppointments.length
-                    }
-                    onClick={() =>
-                      setAppointmentPage((p) => p + 1)
-                    }
+                    disabled={appointmentPage * APPOINT_LIMIT >= appointments.length}
+                    onClick={() => setAppointmentPage((p) => p + 1)}
                     className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
@@ -345,7 +299,6 @@ export default function ReceptionistPage() {
               </div>
             </div>
 
-            {/* PATIENT LIST */}
             <div className="bg-white rounded-xl shadow-md">
               <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-6 py-4 text-white font-semibold text-xl">
                 Patients
@@ -368,11 +321,10 @@ export default function ReceptionistPage() {
                       <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
                         {p.name.charAt(0)}
                       </div>
+
                       <div>
                         <p className="font-medium">{p.name}</p>
-                        <p className="text-sm text-gray-600">
-                          {p.email}
-                        </p>
+                        <p className="text-sm text-gray-600">{p.email}</p>
                       </div>
                     </div>
                   ))}
@@ -388,14 +340,12 @@ export default function ReceptionistPage() {
                   </button>
 
                   <span className="text-gray-700 font-medium">
-                    Page {patientPage} of {Math.ceil(filteredPatients.length / PATIENT_LIMIT) || 1}
+                    Page {patientPage} of{" "}
+                    {Math.ceil(filteredPatients.length / PATIENT_LIMIT) || 1}
                   </span>
 
                   <button
-                    disabled={
-                      patientPage * PATIENT_LIMIT >=
-                      filteredPatients.length
-                    }
+                    disabled={patientPage * PATIENT_LIMIT >= filteredPatients.length}
                     className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => setPatientPage((p) => p + 1)}
                   >
@@ -406,7 +356,6 @@ export default function ReceptionistPage() {
             </div>
           </div>
 
-          {/* CREATE APPOINTMENT */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-md sticky top-8">
               <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-4 text-white font-semibold text-xl">
@@ -416,8 +365,12 @@ export default function ReceptionistPage() {
               <div className="p-6 space-y-4">
                 {myClinic && (
                   <div className="bg-purple-50 border border-purple-200 p-4 rounded-lg mb-4">
-                    <p className="text-sm font-semibold text-purple-900">Your Clinic:</p>
-                    <p className="text-lg font-bold text-purple-700">{myClinic.name}</p>
+                    <p className="text-sm font-semibold text-purple-900">
+                      Your Clinic:
+                    </p>
+                    <p className="text-lg font-bold text-purple-700">
+                      {myClinic.name}
+                    </p>
                   </div>
                 )}
 
@@ -433,10 +386,7 @@ export default function ReceptionistPage() {
                   >
                     <option value="">Select Doctor</option>
                     {doctors.map((d: any) => (
-                      <option
-                        key={d.doctor.id}
-                        value={d.doctor.id}
-                      >
+                      <option key={d.doctor.id} value={d.doctor.id}>
                         {d.doctor.name}
                       </option>
                     ))}
@@ -504,10 +454,8 @@ export default function ReceptionistPage() {
                     className="w-full border px-4 py-2 rounded-lg"
                     rows={3}
                     value={form.notes}
-                    onChange={(e) =>
-                      setForm({ ...form, notes: e.target.value })
-                    }
-                  ></textarea>
+                    onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  />
                 </div>
 
                 <button
@@ -521,6 +469,21 @@ export default function ReceptionistPage() {
           </div>
         </div>
       </main>
+
+      <footer className="bg-white border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            Need help or have any query?
+          </p>
+
+          <button
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium"
+            onClick={() => navigate("/contact-us")}
+          >
+            Contact Us
+          </button>
+        </div>
+      </footer>
 
       <ConfirmDialog
         open={confirmOpen}

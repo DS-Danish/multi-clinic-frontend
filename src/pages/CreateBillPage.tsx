@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { BillingAPI } from "../services/billing.service";
 import { ReceptionistAPI } from "../services/receptionist.service";
 import { useToast } from "../components/ui/ToastProvider";
+import api from "../services/api";
 
 interface Patient {
   id: string;
@@ -130,6 +131,18 @@ export default function CreateBillPage() {
 
       console.log("CREATE BILL RESPONSE", res.data);
 
+      try {
+        await api.post("/notifications", {
+          userId: form.patientId,
+          message: `A new bill has been generated for your appointment. Amount due: ${Math.max(
+            0,
+            Number(form.totalAmount || 0) - Number(form.discount || 0)
+          )}.`,
+        });
+      } catch (notificationError) {
+        console.warn("Failed to create bill notification", notificationError);
+      }
+
       toast.show("Bill created successfully", "success");
 
       if (res.data?.id) {
@@ -158,6 +171,15 @@ export default function CreateBillPage() {
     <div className="min-h-screen bg-gray-50 px-6 py-8">
       <div className="mx-auto max-w-3xl">
         <div className="mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="font-medium">Back</span>
+          </button>
           <h1 className="text-3xl font-bold text-gray-900">Create Bill</h1>
           <p className="mt-1 text-gray-500">
             Generate a billing invoice for a patient appointment.

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useToast } from "../components/ui/ToastProvider";
+import { getCurrentUser } from "../utils/auth";
 
 interface ContactForm {
   name: string;
@@ -8,8 +9,28 @@ interface ContactForm {
   message: string;
 }
 
+const getDashboardPath = (): string => {
+  const user = getCurrentUser();
+
+  switch (user?.role) {
+    case "DOCTOR":
+      return "/doctor-dashboard";
+    case "RECEPTIONIST":
+      return "/receptionist";
+    case "PATIENT":
+      return "/patient-details";
+    case "SYSTEM_ADMIN":
+      return "/super-admin";
+    case "CLINIC_ADMIN":
+      return "/admin-dashboard";
+    default:
+      return "/login";
+  }
+};
+
 export default function ContactUs() {
   const toast = useToast();
+  const dashboardPath = getDashboardPath();
 
   const [form, setForm] = useState<ContactForm>({
     name: "",
@@ -40,6 +61,10 @@ export default function ContactUs() {
       subject: "",
       message: "",
     });
+
+    setTimeout(() => {
+      window.location.href = dashboardPath;
+    }, 800);
   };
 
   return (
@@ -104,8 +129,8 @@ export default function ContactUs() {
 
         <p className="text-center text-sm text-gray-500 mt-6">
           Back to{" "}
-          <a href="/login" className="text-blue-600 font-semibold">
-            Login
+          <a href={dashboardPath} className="text-blue-600 font-semibold">
+            Dashboard
           </a>
         </p>
       </div>

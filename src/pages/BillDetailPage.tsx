@@ -8,23 +8,60 @@ export default function BillDetailPage() {
   const { billId } = useParams();
   const [bill, setBill] = useState<any>(null);
   const [amount, setAmount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [paying, setPaying] = useState(false);
 
   useEffect(() => {
-    BillingAPI.getBill(String(billId)).then((res: any) => {
-      setBill(res.data);
-      setAmount(res.data.totalAmount - (res.data.discount ?? 0));
-    });
+    const loadBill = async () => {
+      try {
+        setLoading(true);
+        const res = await BillingAPI.getBill(String(billId));
+        setBill(res.data);
+        setAmount(res.data.totalAmount - (res.data.discount ?? 0));
+      } catch (error: any) {
+        const message =
+          error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          "Failed to load bill details";
+        toast.show(Array.isArray(message) ? message[0] : message, "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadBill();
   }, [billId]);
 
   const pay = async () => {
-    await BillingAPI.payBill(String(billId), {
-      amount,
-      method: "CASH",
-    });
-    toast.show("Payment successful", "success");
+    if (amount <= 0) {
+      toast.show("Payment amount must be greater than 0", "error");
+      return;
+    }
+
+    try {
+      setPaying(true);
+      await BillingAPI.payBill(String(billId), {
+        amount,
+        method: "CASH",
+      });
+      toast.show("Payment successful", "success");
+
+      const res = await BillingAPI.getBill(String(billId));
+      setBill(res.data);
+      setAmount(res.data.totalAmount - (res.data.discount ?? 0));
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        "Failed to process payment";
+      toast.show(Array.isArray(message) ? message[0] : message, "error");
+    } finally {
+      setPaying(false);
+    }
   };
 
-  if (!bill) return <div>Loading...</div>;
+  if (loading) return <div>Loading...</div>;
+  if (!bill) return <div>Unable to load bill.</div>;
 
   return (
     <div>
@@ -48,7 +85,9 @@ export default function BillDetailPage() {
         value={amount}
         onChange={(e) => setAmount(Number(e.target.value))}
       />
-      <button onClick={pay}>Pay</button>
+      <button onClick={pay} disabled={paying}>
+        {paying ? "Processing..." : "Pay"}
+      </button>
     </div>
   );
 }

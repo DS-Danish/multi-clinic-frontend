@@ -102,6 +102,18 @@ export default function PatientDetailPage() {
     setNotifications(res.data);
   };
 
+  useEffect(() => {
+    if (!user || activeTab !== "notifications") return;
+
+    loadNotifications();
+    const intervalId = window.setInterval(() => {
+      loadNotifications();
+    }, 10000);
+
+    return () => window.clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, activeTab]);
+
   const loadReports = async () => {
     if (!user?.id) return;
     try {

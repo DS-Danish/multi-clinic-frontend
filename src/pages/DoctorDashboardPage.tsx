@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { getCurrentUser } from "../utils/auth";
-import { MessageCircle } from "lucide-react";
 import DoctorLayout from "../components/DoctorLayout";
 
 import {
@@ -9,6 +8,8 @@ import {
   Users,
   ClipboardList,
   FileText,
+  MessageCircle,
+  Phone,
 } from "lucide-react";
 
 export default function DoctorDashboardPage() {
@@ -90,6 +91,14 @@ export default function DoctorDashboardPage() {
               >
                 <MessageCircle className="w-5 h-5" />
                 <span>AI Medical Assistant</span>
+              </button>
+
+              <button
+                onClick={() => window.location.href = "/contact-us"}
+                className="w-full flex items-center gap-3 p-3 rounded-lg bg-cyan-50 hover:bg-cyan-100 text-cyan-700 transition"
+              >
+                <Phone className="w-5 h-5" />
+                <span>Contact Support</span>
               </button>
             </div>
           </div>

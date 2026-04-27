@@ -19,8 +19,8 @@ import {
   CheckCircle,
   AlertCircle,
   UserPlus,
-  CalendarPlus,
-  MessageCircle
+  MessageCircle,
+  Phone
 } from "lucide-react";
 
 export default function ClinicAdminDashboard() {
@@ -113,10 +113,9 @@ export default function ClinicAdminDashboard() {
 
   const quickActions = [
     { icon: UserPlus, label: "Add Doctor", color: "bg-blue-500", action: () => navigate("/admin-dashboard/doctors/add") },
-    { icon: Users, label: "Add Patient", color: "bg-green-500", action: () => {} },
-    { icon: CalendarPlus, label: "New Appointment", color: "bg-purple-500", action: () => {} },
     { icon: UserCog, label: "Add Receptionist", color: "bg-orange-500", action: () => navigate("/admin-dashboard/receptionists/add") },
     { icon: MessageCircle, label: "AI Medical Assistant", color: "bg-blue-500", action: () => navigate("/chatbot") },
+    { icon: Phone, label: "Contact Support", color: "bg-cyan-500", action: () => navigate("/contact-us") },
   ];
 
   return (
@@ -145,6 +144,7 @@ export default function ClinicAdminDashboard() {
             { id: "appointments", label: "Appointments", icon: Calendar, badge: stats.pendingAppointments },
             { id: "receptionists", label: "Receptionists", icon: UserCog },
             { id: "settings", label: "Settings", icon: Settings },
+            { id: "contact", label: "Contact", icon: Phone, route: "/contact-us" },
           ].map((item) => (
             <button
               key={item.id}
