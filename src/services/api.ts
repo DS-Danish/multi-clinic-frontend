@@ -26,7 +26,8 @@ api.interceptors.response.use(
     const isAuthEndpoint =
       requestUrl.includes("/auth/login") ||
       requestUrl.includes("/auth/register") ||
-      requestUrl.includes("/auth/verify-email");
+      requestUrl.includes("/auth/verify-email") ||
+      requestUrl.includes("/auth/resend-verification");
 
     if (status === 401 && !isAuthEndpoint) {
       localStorage.removeItem("token");

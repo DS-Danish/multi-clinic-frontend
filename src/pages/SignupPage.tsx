@@ -18,26 +18,26 @@ export default function SignupPage() {
   });
 
   const handleSignup = async (): Promise<void> => {
-    const res = await registerUser({
-      name: form.name,
-      email: form.email,
-      password: form.password,
-      role: form.role,
-    });
+    try {
+      const res = await registerUser({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        role: form.role,
+      });
 
-    if (!res) {
-      toast.show("Signup failed. Email may already exist.", "error");
-      return;
-    }
+      toast.show(
+        res.verificationEmailSent
+          ? "Signup successful. Check your email to verify your account."
+          : "Account created. We could not send the verification email yet.",
+        "success"
+      );
 
-    toast.show("Signup successful!", "success");
-
-    if (form.role === "DOCTOR") {
-      window.location.href = "/dashboard";
-    } else if (form.role === "RECEPTIONIST") {
-      window.location.href = "/receptionist";
-    } else {
-      window.location.href = "/patient-details";
+      window.location.href = `/verify-email?email=${encodeURIComponent(
+        res.verificationEmailSentTo
+      )}&sent=${res.verificationEmailSent ? "1" : "0"}`;
+    } catch (error: any) {
+      toast.show(error.message || "Signup failed", "error");
     }
   };
 

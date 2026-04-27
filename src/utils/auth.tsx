@@ -19,6 +19,43 @@ export type AuthUser = {
     updatedAt: Date;
 }
 
+export type RegisterResponse = {
+  message: string;
+  requiresEmailVerification: boolean;
+  verificationEmailSent: boolean;
+  verificationEmailSentTo: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: UserRole;
+    emailVerified?: boolean;
+  };
+};
+
+export type ResendVerificationResponse = {
+  message: string;
+  success: boolean;
+  sentTo?: string;
+};
+
+function getApiMessage(err: unknown, fallback: string): string {
+  if (err && typeof err === "object") {
+    const response = (err as { response?: { data?: { message?: unknown } } })
+      .response;
+    const message = response?.data?.message;
+    if (typeof message === "string") return message;
+    if (Array.isArray(message)) {
+      return message.filter((item) => typeof item === "string").join("\n");
+    }
+
+    const errorMessage = (err as { message?: unknown }).message;
+    if (typeof errorMessage === "string") return errorMessage;
+  }
+
+  return fallback;
+}
+
 // 🔐 Register
 export async function registerUser(data: {
   name: string;
@@ -26,13 +63,13 @@ export async function registerUser(data: {
   password: string;
   role: UserRole;
   phone?: string;
-}) {
+}): Promise<RegisterResponse> {
   try {
     const res = await api.post("/auth/register", data);
     return res.data;
   } catch (err) {
     console.error("Register error:", err);
-    return null;
+    throw new Error(getApiMessage(err, "Registration failed"));
   }
 }
 
@@ -67,7 +104,21 @@ export async function loginUser(
     return userToStore;
   } catch (err) {
     console.error("Login error:", err);
-    return null;
+    throw new Error(getApiMessage(err, "Login failed"));
+  }
+}
+
+export async function resendVerificationEmail(
+  email: string
+): Promise<ResendVerificationResponse> {
+  try {
+    const res = await api.post("/auth/resend-verification", { email });
+    return res.data;
+  } catch (err) {
+    console.error("Resend verification error:", err);
+    throw new Error(
+      getApiMessage(err, "Could not resend verification email")
+    );
   }
 }
 

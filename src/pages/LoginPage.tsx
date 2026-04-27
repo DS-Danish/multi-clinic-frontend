@@ -112,8 +112,18 @@ export default function LoginPage() {
         default:
           window.location.href = "/";
       }
-    } catch {
-      toast.show("Login failed", "error");
+    } catch (error: any) {
+      const message = error.message || "Login failed";
+
+      if (message.toLowerCase().includes("verify your email")) {
+        toast.show(message, "error");
+        window.location.href = `/verify-email?email=${encodeURIComponent(
+          email.trim()
+        )}&sent=1`;
+        return;
+      }
+
+      toast.show(message, "error");
     }
   };
 
